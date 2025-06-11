@@ -15,5 +15,15 @@ class Siswa extends Model
         'kelas',
         'nama_ortu',
         'email_ortu',
+        'wali_murid_id'
     ];
+     public function wali() {
+        return $this->belongsTo(User::class, 'wali_murid_id');
+    }
+    public function nilais() {
+        return $this->hasMany(Nilai::class);
+    }
+    public function pendaftarans() {
+        return $this->hasMany(Pendaftaran::class);
+    }
 }
