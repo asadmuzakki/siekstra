@@ -16,7 +16,8 @@ return new class extends Migration {
             $table->text('deskripsi')->nullable();
             $table->date('jadwal');
             $table->string('tempat');
-            $table->foreignId('tutor_id')->constrained('users', 'id')->onDelete('cascade');
+            $table->foreignId('tutor_id')->constrained('users', 'id')->onDelete('cascade')->onUpdate('cascade');
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
         });
     }
