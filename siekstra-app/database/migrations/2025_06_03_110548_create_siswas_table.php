@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('kelas', 50); // Kelas siswa
             $table->string('nama_ortu', 100); // Nama orang tua siswa
             $table->string('email_ortu', 100); // Email orang tua siswa
-            $table->foreignId('wali_murid_id')->constrained('users', 'id')->onDelete('cascade')->onUpdate('cascade')->nullable(); // Wali murid, foreign key ke tabel users
             $table->timestamps(); // Created at & Updated at
         });
     }
