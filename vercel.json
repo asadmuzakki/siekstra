@@ -24,7 +24,7 @@
         "APP_MAINTENANCE_DRIVER": "file",
         "PHP_CLI_SERVER_WORKERS": "4",
         "BCRYPT_ROUNDS": "12",
-        
+
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
@@ -33,7 +33,7 @@
         "VIEW_COMPILED_PATH": "/tmp",
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
-        "SESSION_DRIVER": "database",
+        "SESSION_DRIVER": "cookies",
         "SESSION_DOMAIN": "siekstra.vercel.app",
         "SESSION_SECURE_COOKIE": "false"
     }
