@@ -29,11 +29,17 @@
         "DB_PORT": "3306",
         "DB_DATABASE": "siekstra-app",
         "DB_USERNAME": "root",
-        "DB_PASSWORD": "","SESSION_DRIVER": "database",
-        "SESSION_LIFETIME": "120",
-        "SESSION_ENCRYPT": "false",
-        "SESSION_PATH": "/",
-        "SESSION_DOMAIN": "null",
-        "CACHE_STORE": "database"
+        "DB_PASSWORD": "",
+        "APP_CONFIG_CACHE": "/tmp/config.php",
+        "APP_EVENTS_CACHE": "/tmp/events.php",
+        "APP_PACKAGES_CACHE": "/tmp/packages.php",
+        "APP_ROUTES_CACHE": "/tmp/routes.php",
+        "APP_SERVICES_CACHE": "/tmp/services.php",
+        "VIEW_COMPILED_PATH": "/tmp",
+        "CACHE_DRIVER": "array",
+        "LOG_CHANNEL": "stderr",
+        "SESSION_DRIVER": "cookie",
+        "SESSION_DOMAIN": "siekstra.vercel.app",
+        "SESSION_SECURE_COOKIE": "false"
     }
 }
