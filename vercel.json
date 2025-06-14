@@ -24,12 +24,7 @@
         "APP_MAINTENANCE_DRIVER": "file",
         "PHP_CLI_SERVER_WORKERS": "4",
         "BCRYPT_ROUNDS": "12",
-        "DB_CONNECTION": "mysql",
-        "DB_HOST": "127.0.0.1",
-        "DB_PORT": "3306",
-        "DB_DATABASE": "siekstra-app",
-        "DB_USERNAME": "root",
-        "DB_PASSWORD": "",
+        
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
