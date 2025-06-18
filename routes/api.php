@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Api\SiswaController;
 use App\Http\Controllers\Api\EkskulController;
 use App\Http\Controllers\Api\TesController;
+use App\Http\Controllers\Api\AbsensiController;
+use App\Http\Controllers\Api\KegiatanController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -28,6 +30,7 @@ Route::post('/tes-absensi', [TesController::class, 'store']);
 Route::apiResource('siswas', SiswaController::class);
 Route::apiResource('ekskul', EkskulController::class);
 
-Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
-Route::get('/absensi-rekap', [\App\Http\Controllers\Api\AbsensiController::class, 'rekap']);
-Route::apiResource('kegiatan', \App\Http\Controllers\Api\KegiatanController::class);
+Route::apiResource('absensi', AbsensiController::class);
+Route::get('/riwayat-absensi', [AbsensiController::class, 'rekap']);
+Route::get('/riwayat-kegiatan', [KegiatanController::class, 'rekap']);
+Route::apiResource('kegiatan', KegiatanController::class);

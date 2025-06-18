@@ -22,34 +22,34 @@ class AbsensiController extends Controller
      * Rekap Absensi
      */
     public function rekap()
-{
-    $absensis = Absensi::with('details')->get();
+    {
+        $absensis = Absensi::with('details')->get();
 
-    $rekap = $absensis->map(function ($absensi) {
-        $total = $absensi->details->count();
-        $hadir = $absensi->details->where('status', 'Hadir')->count();
-        $sakit = $absensi->details->where('status', 'Sakit')->count();
-        $izin  = $absensi->details->where('status', 'Izin')->count();
-        $alpa  = $absensi->details->where('status', 'Alpa')->count();
+        $rekap = $absensis->map(function ($absensi) {
+            $total = $absensi->details->count();
+            $hadir = $absensi->details->where('status', 'Hadir')->count();
+            $sakit = $absensi->details->where('status', 'Sakit')->count();
+            $izin = $absensi->details->where('status', 'Izin')->count();
+            $alpa = $absensi->details->where('status', 'Alpa')->count();
 
-        return [
-            'id' => $absensi->id,
-            'agenda' => $absensi->agenda,
-            'tanggal' => $absensi->tanggal,
-            'jumlah_siswa' => $total,
-            'hadir' => $hadir,
-            'sakit' => $sakit,
-            'izin' => $izin,
-            'alpa' => $alpa,
-        ];
-    });
+            return [
+                'id' => $absensi->id,
+                'agenda' => $absensi->agenda,
+                'tanggal' => $absensi->tanggal,
+                'jumlah_siswa' => $total,
+                'hadir' => $hadir,
+                'sakit' => $sakit,
+                'izin' => $izin,
+                'alpa' => $alpa,
+            ];
+        });
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Rekap absensi berhasil diambil',
-        'data' => $rekap
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'message' => 'Rekap absensi berhasil diambil',
+            'data' => $rekap
+        ]);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -102,11 +102,11 @@ class AbsensiController extends Controller
     public function update(Request $request, $id)
     {
         $absensi = Absensi::find($id);
-    
+
         if (!$absensi) {
             return new AbsensiResource(false, 'Absensi Not Found', null);
         }
-    
+
         $validated = $request->validate([
             'ekskul_id' => 'required|exists:ekskuls,id',
             'tanggal' => 'required|date',
@@ -116,17 +116,17 @@ class AbsensiController extends Controller
             'absensis.*.status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
             'absensis.*.keterangan' => 'nullable|string',
         ]);
-    
+
         // Update data absensi utama
         $absensi->update([
             'ekskul_id' => $validated['ekskul_id'],
             'tanggal' => $validated['tanggal'],
             'agenda' => $validated['agenda'] ?? null,
         ]);
-    
+
         // Hapus detail absensi lama
         $absensi->details()->delete();
-    
+
         // Simpan detail absensi baru
         foreach ($validated['absensis'] as $absensiData) {
             $absensi->details()->create([
@@ -135,10 +135,10 @@ class AbsensiController extends Controller
                 'keterangan' => $absensiData['keterangan'] ?? null,
             ]);
         }
-    
+
         // Muat relasi details untuk ditampilkan dalam respons
         $absensi->load('details');
-    
+
         return new AbsensiResource(true, 'Absensi Updated Successfully', $absensi);
     }
 

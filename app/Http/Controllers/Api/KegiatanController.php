@@ -18,6 +18,38 @@ class KegiatanController extends Controller
         $kegiatans->load('details', 'ekskul');
         return new KegiatanResource(true, 'List of Kegiatan', $kegiatans);
     }
+    /**
+     * Rekap Kegiatan
+     */
+    public function rekap()
+    {
+        $kegiatans = Kegiatan::with('details')->get();
+
+        $rekap = $kegiatans->map(function ($kegiatan) {
+            $total = $kegiatan->details->count();
+            $hadir = $kegiatan->details->where('status', 'Hadir')->count();
+            $sakit = $kegiatan->details->where('status', 'Sakit')->count();
+            $izin = $kegiatan->details->where('status', 'Izin')->count();
+            $alpa = $kegiatan->details->where('status', 'Alpa')->count();
+
+            return [
+                'id' => $kegiatan->id,
+                'nama_kegiatan' => $kegiatan->nama_kegiatan,
+                'tanggal' => $kegiatan->tanggal,
+                'jumlah_siswa' => $total,
+                'hadir' => $hadir,
+                'sakit' => $sakit,
+                'izin' => $izin,
+                'alpa' => $alpa,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rekap absensi berhasil diambil',
+            'data' => $rekap
+        ]);
+    }
 
     /**
      * Store a newly created resource in storage.
