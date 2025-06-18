@@ -31,6 +31,6 @@ Route::apiResource('siswas', SiswaController::class);
 Route::apiResource('ekskul', EkskulController::class);
 
 Route::apiResource('absensi', AbsensiController::class);
-Route::get('/riwayat-absensi', [AbsensiController::class, 'rekap']);
+Route::get('/riwayat-absensi/{ekskul_id}', [AbsensiController::class, 'rekap']);
 Route::get('/riwayat-kegiatan', [KegiatanController::class, 'rekap']);
 Route::apiResource('kegiatan', KegiatanController::class);

@@ -21,9 +21,11 @@ class AbsensiController extends Controller
     /**
      * Rekap Absensi
      */
-    public function rekap()
+    public function rekap($ekskul_id)
     {
-        $absensis = Absensi::with('details')->get();
+        $absensis = Absensi::with('details')
+        ->where('ekskul_id', $ekskul_id)
+        ->get();
 
         $rekap = $absensis->map(function ($absensi) {
             $total = $absensi->details->count();
