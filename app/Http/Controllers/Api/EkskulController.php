@@ -26,9 +26,10 @@ class EkskulController extends Controller
         $validated = $request->validate([
             'nama_ekskul' => 'required|string|max:100',
             'deskripsi' => 'nullable|string|max:255',
-            'jadwal' => 'required|string|max:100',
+            'jadwal' => 'required|date',
             'tempat' => 'required|string|max:100',
             'tutor_id' => 'required|exists:users,id',
+            'status' => 'required|in:Aktif,Nonaktif', // Assuming status can be Aktif or Nonaktif
         ]);
 
         $ekskul = Ekskul::create($validated);

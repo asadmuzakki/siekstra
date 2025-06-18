@@ -11,7 +11,8 @@ class Ekskul extends Model
         'deskripsi',
         'jadwal',
         'tempat',
-        'tutor_id'
+        'tutor_id',
+        'status'
     ];
 
     public function tutor()
