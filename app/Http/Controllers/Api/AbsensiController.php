@@ -15,6 +15,7 @@ class AbsensiController extends Controller
     public function index()
     {
         $absensis = Absensi::all();
+        $absensis->load('details'); // Load details for each absensi
         return new AbsensiResource(true, 'List of Absensi', $absensis);
     }
 
@@ -26,7 +27,7 @@ class AbsensiController extends Controller
         $validated = $request->validate([
             'ekskul_id' => 'required|exists:ekskuls,id',
             'tanggal' => 'required|date',
-            'agenda' => 'nullable|string',
+            'agenda' => 'require|string',
             'absensis' => 'required|array',
             'absensis.*.siswa_id' => 'required|exists:siswas,id',
             'absensis.*.status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
