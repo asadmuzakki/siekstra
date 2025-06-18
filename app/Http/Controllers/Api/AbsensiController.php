@@ -27,7 +27,7 @@ class AbsensiController extends Controller
         $validated = $request->validate([
             'ekskul_id' => 'required|exists:ekskuls,id',
             'tanggal' => 'required|date',
-            'agenda' => 'nullable|string',
+            'agenda' => 'required|string',
             'absensis' => 'required|array',
             'absensis.*.siswa_id' => 'required|exists:siswas,id',
             'absensis.*.status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
