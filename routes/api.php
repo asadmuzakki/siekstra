@@ -29,3 +29,4 @@ Route::apiResource('siswas', SiswaController::class);
 Route::apiResource('ekskul', EkskulController::class);
 
 Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
+Route::apiResource('kegiatan', \App\Http\Controllers\Api\KegiatanController::class);

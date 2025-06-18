@@ -24,15 +24,31 @@ class KegiatanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
             'nama_kegiatan' => 'required|string|max:100',
             'kategori' => 'required|string|max:50',
             'tingkat' => 'required|string|max:50',
             'tanggal_kegiatan' => 'required|date',
+            'absensis' => 'required|array',
+            'absensis.*.siswa_id' => 'required|exists:siswas,id',
+            'absensis.*.status' => 'required|in:Hadir,Sakit,Izin,Alpha',
+            'absensis.*.keterangan' => 'nullable|string',
         ]);
-
-        $kegiatan = Kegiatan::create($validated);
+        $kegiatan = Kegiatan::create([
+            'ekskul_id' => $validated['ekskul_id'],
+            'nama_kegiatan' => $validated['nama_kegiatan'],
+            'kategori' => $validated['kategori'],
+            'tingkat' => $validated['tingkat'],
+            'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
+        ]);
+        foreach ($validated['absensis'] as $absensiData) {
+            $kegiatan->details()->create([
+                'siswa_id' => $absensiData['siswa_id'],
+                'status' => $absensiData['status'],
+                'keterangan' => $absensiData['keterangan'] ?? null,
+            ]);
+        }
+        $kegiatan->load('details');
 
         return new KegiatanResource(true, 'Kegiatan Created Successfully', $kegiatan);
     }

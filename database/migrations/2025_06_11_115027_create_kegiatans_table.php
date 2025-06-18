@@ -12,7 +12,6 @@ return new class extends Migration {
     {
         Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswas', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('ekskul_id')->constrained('ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->string('nama_kegiatan');
             $table->enum('kategori', ['lomba', 'non-lomba', 'lainnya']);

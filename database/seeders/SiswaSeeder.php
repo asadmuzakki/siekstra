@@ -34,6 +34,13 @@ class SiswaSeeder extends Seeder
                 'nama_ortu' => 'Bapak Santoso',
                 'email_ortu' => 'santoso@example.com'
             ],
+            [
+                'nama' => 'Dewi Lestari',
+                'nis' => '1234567893',
+                'kelas' => '11B',
+                'nama_ortu' => 'Ibu Lestari',
+                'email_ortu' => 'lestari@example.com',
+            ],
         ]);
     }
 }
