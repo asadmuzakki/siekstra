@@ -45,7 +45,7 @@ class AbsensiController extends Controller
                 'keterangan' => $absensiData['keterangan'] ?? null,
             ]);
         }
-
+        $absensi->load('details');
         return new AbsensiResource(true, 'Absensi Created Successfully', $absensi);
     }
 
