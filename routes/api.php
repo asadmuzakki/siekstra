@@ -19,4 +19,5 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
 Route::apiResource('siswas', SiswaController::class);
 Route::apiResource('ekskul', EkskulController::class);
+Route::post('/tes-absensi', [App\Http\Controllers\Api\TesController::class, 'store']);
 
