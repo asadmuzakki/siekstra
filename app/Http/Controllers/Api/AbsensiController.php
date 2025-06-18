@@ -18,6 +18,38 @@ class AbsensiController extends Controller
         $absensis->load('details');
         return new AbsensiResource(true, 'List of Absensi', $absensis);
     }
+    /**
+     * Rekap Absensi
+     */
+    public function rekap()
+{
+    $absensis = Absensi::with('details')->get();
+
+    $rekap = $absensis->map(function ($absensi) {
+        $total = $absensi->details->count();
+        $hadir = $absensi->details->where('status', 'Hadir')->count();
+        $sakit = $absensi->details->where('status', 'Sakit')->count();
+        $izin  = $absensi->details->where('status', 'Izin')->count();
+        $alpa  = $absensi->details->where('status', 'Alpa')->count();
+
+        return [
+            'id' => $absensi->id,
+            'agenda' => $absensi->agenda,
+            'tanggal' => $absensi->tanggal,
+            'jumlah_siswa' => $total,
+            'hadir' => $hadir,
+            'sakit' => $sakit,
+            'izin' => $izin,
+            'alpa' => $alpa,
+        ];
+    });
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Rekap absensi berhasil diambil',
+        'data' => $rekap
+    ]);
+}
 
     /**
      * Store a newly created resource in storage.

@@ -29,4 +29,5 @@ Route::apiResource('siswas', SiswaController::class);
 Route::apiResource('ekskul', EkskulController::class);
 
 Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
+Route::get('/absensi-rekap', [\App\Http\Controllers\Api\AbsensiController::class, 'rekap']);
 Route::apiResource('kegiatan', \App\Http\Controllers\Api\KegiatanController::class);
