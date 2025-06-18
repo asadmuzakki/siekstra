@@ -29,7 +29,7 @@ class EkskulController extends Controller
             'jadwal' => 'required|date',
             'tempat' => 'required|string|max:100',
             'tutor_id' => 'required|exists:users,id',
-            'status' => 'required|in:Aktif,Nonaktif', // Assuming status can be Aktif or Nonaktif
+            'status' => 'required|in:aktif,nonaktif', // Assuming status can be Aktif or Nonaktif
         ]);
 
         $ekskul = Ekskul::create($validated);
