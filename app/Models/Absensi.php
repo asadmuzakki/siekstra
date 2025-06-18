@@ -9,6 +9,7 @@ class Absensi extends Model
    protected $fillable = [
       'siswa_id',
       'ekskul_id',
+      'agenda',
       'tanggal',
       'status'
    ];
