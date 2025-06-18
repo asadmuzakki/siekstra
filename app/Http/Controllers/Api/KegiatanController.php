@@ -15,6 +15,7 @@ class KegiatanController extends Controller
     public function index()
     {
         $kegiatans = Kegiatan::all();
+        $kegiatans->load('details', 'ekskul');
         return new KegiatanResource(true, 'List of Kegiatan', $kegiatans);
     }
 

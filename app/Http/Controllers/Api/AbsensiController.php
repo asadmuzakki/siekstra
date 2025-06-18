@@ -70,20 +70,43 @@ class AbsensiController extends Controller
     public function update(Request $request, $id)
     {
         $absensi = Absensi::find($id);
-
+    
         if (!$absensi) {
             return new AbsensiResource(false, 'Absensi Not Found', null);
         }
-
+    
         $validated = $request->validate([
-            'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
             'tanggal' => 'required|date',
-            'status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
+            'agenda' => 'nullable|string',
+            'absensis' => 'required|array',
+            'absensis.*.siswa_id' => 'required|exists:siswas,id',
+            'absensis.*.status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
+            'absensis.*.keterangan' => 'nullable|string',
         ]);
-
-        $absensi->update($validated);
-
+    
+        // Update data absensi utama
+        $absensi->update([
+            'ekskul_id' => $validated['ekskul_id'],
+            'tanggal' => $validated['tanggal'],
+            'agenda' => $validated['agenda'] ?? null,
+        ]);
+    
+        // Hapus detail absensi lama
+        $absensi->details()->delete();
+    
+        // Simpan detail absensi baru
+        foreach ($validated['absensis'] as $absensiData) {
+            $absensi->details()->create([
+                'siswa_id' => $absensiData['siswa_id'],
+                'status' => $absensiData['status'],
+                'keterangan' => $absensiData['keterangan'] ?? null,
+            ]);
+        }
+    
+        // Muat relasi details untuk ditampilkan dalam respons
+        $absensi->load('details');
+    
         return new AbsensiResource(true, 'Absensi Updated Successfully', $absensi);
     }
 
