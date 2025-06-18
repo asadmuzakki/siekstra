@@ -24,13 +24,27 @@ class AbsensiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
             'tanggal' => 'required|date',
-            'status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
+            'agenda' => 'nullable|string',
+            'absensis' => 'required|array',
+            'absensis.*.siswa_id' => 'required|exists:siswas,id',
+            'absensis.*.status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
+            'absensis.*.keterangan' => 'nullable|string',
         ]);
 
-        $absensi = Absensi::create($validated);
+        $absensi = Absensi::create([
+            'ekskul_id' => $validated['ekskul_id'],
+            'tanggal' => $validated['tanggal'],
+            'agenda' => $validated['agenda'] ?? null,
+        ]);
+        foreach ($validated['absensis'] as $absensiData) {
+            $absensi->details()->create([
+                'siswa_id' => $absensiData['siswa_id'],
+                'status' => $absensiData['status'],
+                'keterangan' => $absensiData['keterangan'] ?? null,
+            ]);
+        }
 
         return new AbsensiResource(true, 'Absensi Created Successfully', $absensi);
     }

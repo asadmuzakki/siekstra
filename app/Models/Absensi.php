@@ -13,9 +13,9 @@ class Absensi extends Model
       'status'
    ];
 
-   public function siswa()
+   public function details()
    {
-      return $this->belongsTo(Siswa::class);
+      return $this->hasMany(DetailAbsensi::class);
    }
 
    public function ekskul()

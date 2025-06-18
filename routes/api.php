@@ -17,8 +17,15 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
         return response()->json(['message' => 'Selamat datang admin!']);
     });
 });
+Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(function () {
+    Route::get('/dashboard', function () {
+        return response()->json(['message' => 'Selamat datang member!']);
+    });
+    // Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
+});
 
 Route::post('/tes-absensi', [TesController::class, 'store']);
 Route::apiResource('siswas', SiswaController::class);
 Route::apiResource('ekskul', EkskulController::class);
 
+Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
