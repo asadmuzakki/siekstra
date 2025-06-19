@@ -94,7 +94,7 @@ class AbsensiController extends Controller
         if (!$absensi) {
             return new AbsensiResource(false, 'Absensi Not Found', null);
         }
-
+        $absensi->load('details');
         return new AbsensiResource(true, 'Absensi Found', $absensi);
     }
 
