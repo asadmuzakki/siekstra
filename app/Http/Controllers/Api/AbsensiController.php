@@ -32,7 +32,7 @@ class AbsensiController extends Controller
             $hadir = $absensi->details->where('status', 'Hadir')->count();
             $sakit = $absensi->details->where('status', 'Sakit')->count();
             $izin = $absensi->details->where('status', 'Izin')->count();
-            $alpa = $absensi->details->where('status', 'Alpa')->count();
+            $alpha = $absensi->details->where('status', 'Alpha')->count();
 
             return [
                 'id' => $absensi->id,
@@ -42,7 +42,7 @@ class AbsensiController extends Controller
                 'hadir' => $hadir,
                 'sakit' => $sakit,
                 'izin' => $izin,
-                'alpa' => $alpa,
+                'alpha' => $alpha,
             ];
         });
 
