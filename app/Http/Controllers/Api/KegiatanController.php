@@ -21,16 +21,16 @@ class KegiatanController extends Controller
     /**
      * Rekap Kegiatan
      */
-    public function rekap()
+    public function rekap($ekskul_id)
     {
-        $kegiatans = Kegiatan::with('details')->get();
+        $kegiatans = Kegiatan::with('details')->where('ekskul_id', $ekskul_id)->get();
 
         $rekap = $kegiatans->map(function ($kegiatan) {
             $total = $kegiatan->details->count();
             $hadir = $kegiatan->details->where('status', 'Hadir')->count();
             $sakit = $kegiatan->details->where('status', 'Sakit')->count();
             $izin = $kegiatan->details->where('status', 'Izin')->count();
-            $alpa = $kegiatan->details->where('status', 'Alpa')->count();
+            $alpha = $kegiatan->details->where('status', 'Alpha')->count();
 
             return [
                 'id' => $kegiatan->id,
@@ -40,7 +40,7 @@ class KegiatanController extends Controller
                 'hadir' => $hadir,
                 'sakit' => $sakit,
                 'izin' => $izin,
-                'alpa' => $alpa,
+                'alpha' => $alpha,
             ];
         });
 
