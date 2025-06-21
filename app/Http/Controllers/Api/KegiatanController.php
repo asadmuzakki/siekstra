@@ -35,7 +35,7 @@ class KegiatanController extends Controller
             return [
                 'id' => $kegiatan->id,
                 'nama_kegiatan' => $kegiatan->nama_kegiatan,
-                'tanggal' => $kegiatan->tanggal,
+                'tanggal_kegiatan' => $kegiatan->tanggal_kegiatan,
                 'jumlah_siswa' => $total,
                 'hadir' => $hadir,
                 'sakit' => $sakit,

@@ -15,6 +15,7 @@ class NilaiController extends Controller
     public function index()
     {
         $nilais = Nilai::all();
+        $nilais->load('details'); // Eager load details relationship
         return new NilaiResource(true, 'List of Nilai', $nilais);
     }
 
@@ -74,7 +75,7 @@ class NilaiController extends Controller
     public function show($id)
     {
         $nilai = Nilai::find($id);
-
+        $nilai->load('details'); // Eager load details relationship
         if (!$nilai) {
             return new NilaiResource(false, 'Nilai Not Found', null);
         }
@@ -94,13 +95,56 @@ class NilaiController extends Controller
         }
 
         $validated = $request->validate([
-            'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
-            'nilai' => 'required|numeric|min:0|max:100',
-            'keterangan' => 'nullable|string|max:255',
+            'tanggal' => 'required|date',
+            'penilaians' => 'required|array',
+            'penilaians.*.siswa_id' => 'required|exists:siswas,id',
+            'penilaians.*.kehadiran' => 'required|string',
+            'penilaians.*.keaktifan' => 'required|string',
+            'penilaians.*.praktik' => 'required|string',
+            'penilaians.*.keterangan' => 'nullable|string|max:255',
         ]);
 
-        $nilai->update($validated);
+        // Update data utama nilai
+        $nilai->update([
+            'ekskul_id' => $validated['ekskul_id'],
+            'tanggal' => $validated['tanggal'],
+        ]);
+
+        // Hapus detail nilai lama
+        $nilai->details()->delete();
+
+        // Simpan detail nilai baru
+        foreach ($validated['penilaians'] as $data) {
+            $kehadiran = (float) $data['kehadiran'];
+            $keaktifan = (float) $data['keaktifan'];
+            $praktik = (float) $data['praktik'];
+
+            $nilai_akhir = ($kehadiran * 0.4) + ($keaktifan * 0.3) + ($praktik * 0.3);
+
+            if ($nilai_akhir >= 94 && $nilai_akhir <= 100) {
+                $index_nilai = 'A';
+            } elseif ($nilai_akhir >= 86 && $nilai_akhir <= 93) {
+                $index_nilai = 'B';
+            } elseif ($nilai_akhir >= 80 && $nilai_akhir <= 85) {
+                $index_nilai = 'C';
+            } else {
+                $index_nilai = 'D';
+            }
+
+            $nilai->details()->create([
+                'siswa_id' => $data['siswa_id'],
+                'kehadiran' => $data['kehadiran'],
+                'keaktifan' => $data['keaktifan'],
+                'praktik' => $data['praktik'],
+                'nilai_akhir' => (string) round($nilai_akhir, 2),
+                'index_nilai' => $index_nilai,
+                'keterangan' => $data['keterangan'] ?? null,
+            ]);
+        }
+
+        // Muat relasi details untuk ditampilkan dalam respons
+        $nilai->load('details');
 
         return new NilaiResource(true, 'Nilai Updated Successfully', $nilai);
     }
