@@ -10,11 +10,7 @@ class Nilai extends Model
         'ekskul_id',
         'tanggal',
     ];
-
-    public function siswa()
-    {
-        return $this->belongsTo(Siswa::class);
-    }
+    
     public function ekskul()
     {
         return $this->belongsTo(Ekskul::class);
