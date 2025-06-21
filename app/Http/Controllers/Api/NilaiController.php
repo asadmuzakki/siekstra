@@ -26,7 +26,6 @@ class NilaiController extends Controller
         $validated = $request->validate([
             'ekskul_id' => 'required|exists:ekskuls,id',
             'tanggal' => 'required|date',
-            'keterangan' => 'nullable|string|max:255',
             'penilaians' => 'required|array',
             'penilaians.*.siswa_id' => 'required|exists:siswas,id',
             'penilaians.*.kehadiran' => 'required|string',
