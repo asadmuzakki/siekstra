@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('siswa_id')->constrained('siswas', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('ekskul_id')->constrained('ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
-            $table->string('nilai');
+            $table->string('kehadiran');
+            $table->string('keaktifan');
+            $table->string('praktik');
+            $table->string('nilai_akhir');
+            $table->string('index_nilai');
             $table->string('keterangan')->nullable();
             $table->timestamps();
         });

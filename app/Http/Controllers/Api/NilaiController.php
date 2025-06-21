@@ -26,11 +26,34 @@ class NilaiController extends Controller
         $validated = $request->validate([
             'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
-            'nilai' => 'required|numeric|min:0|max:100',
+            'kehadiran' => 'required|string',
+            'keaktifan' => 'required|string',
+            'praktik' => 'required|string',
+            'index_nilai' => 'required|string',
             'keterangan' => 'nullable|string|max:255',
         ]);
-
-        $nilai = Nilai::create($validated);
+        $kehadiran = (float) $validated['kehadiran'];
+        $keaktifan = (float) $validated['keaktifan'];
+        $praktik = (float) $validated['praktik'];
+        $index_nilai = $validated['index_nilai'];
+        $nilai_akhir = ($kehadiran * 0.4) + ($keaktifan * 0.3) + ($praktik * 0.3);
+        if($nilai_akhir >= 94 && $nilai_akhir <= 100) {
+            $index_nilai = 'A';
+        } elseif($nilai_akhir >= 86 && $nilai_akhir <= 93) {
+            $index_nilai = 'B';
+        } elseif($nilai_akhir >= 80 && $nilai_akhir <= 85) {
+            $index_nilai = 'C';
+        }
+        $nilai = Nilai::create([
+            'siswa_id' => $validated['siswa_id'],
+            'ekskul_id' => $validated['ekskul_id'],
+            'kehadiran' => $validated['kehadiran'],
+            'keaktifan' => $validated['keaktifan'],
+            'praktik' => $validated['praktik'],
+            'nilai_akhir' => (string) round($nilai_akhir, 2),
+            'index_nilai' => $index_nilai,
+            'keterangan' => $validated['keterangan'] ?? null,
+        ]);
 
         return new NilaiResource(true, 'Nilai Created Successfully', $nilai);
     }

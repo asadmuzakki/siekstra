@@ -35,3 +35,4 @@ Route::apiResource('absensi', AbsensiController::class);
 Route::get('/riwayat-absensi/{ekskul_id}', [AbsensiController::class, 'rekap']);
 Route::get('/riwayat-kegiatan/{ekskul_id}', [KegiatanController::class, 'rekap']);
 Route::apiResource('absensi-tutor', AbsensiTutorController::class);
+Route::apiResource('nilais', \App\Http\Controllers\Api\NilaiController::class);

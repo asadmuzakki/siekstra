@@ -15,6 +15,7 @@ class SiswaController extends Controller
     public function index()
     {
         $siswas = Siswa::all();
+        $siswas->load('nilais'); // Eager load related 'nilais' if needed
         return new SiswaResource(true, 'List of Siswas', $siswas);
     }
 
