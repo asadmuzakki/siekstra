@@ -17,9 +17,9 @@ class DetailNilai extends Model
         'keterangan',
     ];
 
-    public function details()
+    public function nilai()
     {
-        return $this->belongsTo(DetailNilai::class);
+        return $this->belongsTo(Nilai::class);
     }
 
     public function siswa()
