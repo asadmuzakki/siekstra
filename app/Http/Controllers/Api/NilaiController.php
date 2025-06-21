@@ -52,7 +52,7 @@ class NilaiController extends Controller
                 $index_nilai = 'C';
             }
             // Simpan ke tabel nilai (contoh: model Nilai)
-            $nilai->details()::create([
+            $nilai->details()->create([
                 'siswa_id' => $data['siswa_id'],
                 'kehadiran' => $data['kehadiran'], // string
                 'keaktifan' => $data['keaktifan'], // string
