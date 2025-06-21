@@ -29,13 +29,11 @@ class NilaiController extends Controller
             'kehadiran' => 'required|string',
             'keaktifan' => 'required|string',
             'praktik' => 'required|string',
-            'index_nilai' => 'required|string',
             'keterangan' => 'nullable|string|max:255',
         ]);
         $kehadiran = (float) $validated['kehadiran'];
         $keaktifan = (float) $validated['keaktifan'];
         $praktik = (float) $validated['praktik'];
-        $index_nilai = $validated['index_nilai'];
         $nilai_akhir = ($kehadiran * 0.4) + ($keaktifan * 0.3) + ($praktik * 0.3);
         if($nilai_akhir >= 94 && $nilai_akhir <= 100) {
             $index_nilai = 'A';
