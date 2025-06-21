@@ -13,14 +13,8 @@ return new class extends Migration
     {
         Schema::create('nilais', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswas', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('ekskul_id')->constrained('ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
-            $table->string('kehadiran');
-            $table->string('keaktifan');
-            $table->string('praktik');
-            $table->string('nilai_akhir');
-            $table->string('index_nilai');
-            $table->string('keterangan')->nullable();
+            $table->date('tanggal');
             $table->timestamps();
         });
     }

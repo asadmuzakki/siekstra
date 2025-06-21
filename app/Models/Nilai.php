@@ -7,14 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Nilai extends Model
 {
     protected $fillable = [
-        'siswa_id',
         'ekskul_id',
-        'keterangan',
-        'kehadiran',
-        'keaktifan',
-        'praktik',
-        'nilai_akhir',
-        'index_nilai',
+        'tanggal',
     ];
 
     public function siswa()
@@ -24,5 +18,9 @@ class Nilai extends Model
     public function ekskul()
     {
         return $this->belongsTo(Ekskul::class);
+    }
+    public function details()
+    {
+        return $this->hasMany(DetailNilai::class);
     }
 }

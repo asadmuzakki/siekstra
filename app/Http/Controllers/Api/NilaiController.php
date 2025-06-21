@@ -24,34 +24,47 @@ class NilaiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
-            'kehadiran' => 'required|string',
-            'keaktifan' => 'required|string',
-            'praktik' => 'required|string',
+            'tanggal' => 'required|date',
             'keterangan' => 'nullable|string|max:255',
+            'penilaians' => 'required|array',
+            'penilaians.*.siswa_id' => 'required|exists:siswas,id',
+            'penilaians.*.kehadiran' => 'required|string',
+            'penilaians.*.keaktifan' => 'required|string',
+            'penilaians.*.praktik' => 'required|string',
+            'penilaians.*.keterangan' => 'nullable|string|max:255',
         ]);
-        $kehadiran = (float) $validated['kehadiran'];
-        $keaktifan = (float) $validated['keaktifan'];
-        $praktik = (float) $validated['praktik'];
-        $nilai_akhir = ($kehadiran * 0.4) + ($keaktifan * 0.3) + ($praktik * 0.3);
-        if($nilai_akhir >= 94 && $nilai_akhir <= 100) {
-            $index_nilai = 'A';
-        } elseif($nilai_akhir >= 86 && $nilai_akhir <= 93) {
-            $index_nilai = 'B';
-        } elseif($nilai_akhir >= 80 && $nilai_akhir <= 85) {
-            $index_nilai = 'C';
-        }
         $nilai = Nilai::create([
-            'siswa_id' => $validated['siswa_id'],
             'ekskul_id' => $validated['ekskul_id'],
-            'kehadiran' => $validated['kehadiran'],
-            'keaktifan' => $validated['keaktifan'],
-            'praktik' => $validated['praktik'],
-            'nilai_akhir' => (string) round($nilai_akhir, 2),
-            'index_nilai' => $index_nilai,
-            'keterangan' => $validated['keterangan'] ?? null,
+            'tanggal' => $validated['tanggal'],
         ]);
+        foreach ($validated['penilaians'] as $data) {
+            // Konversi sementara ke float untuk perhitungan
+            $kehadiran = (float) $data['kehadiran'];
+            $keaktifan = (float) $data['keaktifan'];
+            $praktik = (float) $data['praktik'];
+
+            $nilai_akhir = ($kehadiran * 0.4) + ($keaktifan * 0.3) + ($praktik * 0.3);
+            if ($nilai_akhir >= 94 && $nilai_akhir <= 100) {
+                $index_nilai = 'A';
+            } elseif ($nilai_akhir >= 86 && $nilai_akhir <= 93) {
+                $index_nilai = 'B';
+            } elseif ($nilai_akhir >= 80 && $nilai_akhir <= 85) {
+                $index_nilai = 'C';
+            }
+            // Simpan ke tabel nilai (contoh: model Nilai)
+            $nilai->details()::create([
+                'siswa_id' => $data['siswa_id'],
+                'kehadiran' => $data['kehadiran'], // string
+                'keaktifan' => $data['keaktifan'], // string
+                'praktik' => $data['praktik'],   // string
+                'nilai_akhir' => (string) round($nilai_akhir, 2),
+                'index_nilai' => $index_nilai,
+                'keterangan' => $data['keterangan'] ?? null,
+            ]);
+        }
+        // Eager load the details relationship to include in the response
+        $nilai->load('details');
 
         return new NilaiResource(true, 'Nilai Created Successfully', $nilai);
     }
