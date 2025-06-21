@@ -10,6 +10,7 @@ class AbsensiTutor extends Model
         'tutor_id',
         'ekskul_id',
         'tanggal',
+        'keterangan',
         'status'
     ];
 

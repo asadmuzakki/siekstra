@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\EkskulController;
 use App\Http\Controllers\Api\TesController;
 use App\Http\Controllers\Api\AbsensiController;
 use App\Http\Controllers\Api\KegiatanController;
+use App\Http\Controllers\Api\AbsensiTutorController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -32,5 +33,5 @@ Route::apiResource('ekskul', EkskulController::class);
 
 Route::apiResource('absensi', AbsensiController::class);
 Route::get('/riwayat-absensi/{ekskul_id}', [AbsensiController::class, 'rekap']);
-Route::get('/riwayat-kegiatan', [KegiatanController::class, 'rekap']);
-Route::apiResource('kegiatan', KegiatanController::class);
+Route::get('/riwayat-kegiatan/{ekskul_id}', [KegiatanController::class, 'rekap']);
+Route::apiResource('absensi-tutor', AbsensiTutorController::class);

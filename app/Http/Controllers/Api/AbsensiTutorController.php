@@ -28,6 +28,7 @@ class AbsensiTutorController extends Controller
             'ekskul_id' => 'required|exists:ekskuls,id',
             'tanggal' => 'required|date',
             'status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
+            'keterangan' => 'nullable|string',
         ]);
 
         $absensiTutor = AbsensiTutor::create($validated);
