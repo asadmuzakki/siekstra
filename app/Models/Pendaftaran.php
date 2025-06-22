@@ -9,7 +9,6 @@ class Pendaftaran extends Model
     protected $fillable = [
         'siswa_id',
         'ekskul_id',
-        'tanggal_daftar'
     ];
 
     public function siswa()
