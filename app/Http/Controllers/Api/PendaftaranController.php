@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pendaftaran;
 use App\Http\Resources\PendaftaranResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class PendaftaranController extends Controller
 {
@@ -17,6 +18,15 @@ class PendaftaranController extends Controller
         $pendaftarans = Pendaftaran::all();
         return new PendaftaranResource(true, 'List of Pendaftaran', $pendaftarans);
     }
+    /**
+     * show by ekskul_id
+     */
+    public function showByEkskul($ekskul_id)
+    {
+        $pendaftarans = Pendaftaran::where('ekskul_id', $ekskul_id)->get();
+        $pendaftarans->load('siswa', 'ekskul'); // Eager load related models
+        return new PendaftaranResource(true, 'List of Pendaftaran by Ekskul', $pendaftarans);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -26,10 +36,13 @@ class PendaftaranController extends Controller
         $validated = $request->validate([
             'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
-            'tanggal_daftar' => 'required|date',
         ]);
 
-        $pendaftaran = Pendaftaran::create($validated);
+        $pendaftaran = Pendaftaran::create([
+            'siswa_id' => $validated['siswa_id'],
+            'ekskul_id' => $validated['ekskul_id'],
+            'tanggal_daftar' => Carbon::today(),
+        ]);
 
         return new PendaftaranResource(true, 'Pendaftaran Created Successfully', $pendaftaran);
     }
@@ -62,10 +75,13 @@ class PendaftaranController extends Controller
         $validated = $request->validate([
             'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
-            'tanggal_daftar' => 'required|date',
         ]);
 
-        $pendaftaran->update($validated);
+        $pendaftaran->update([
+            'siswa_id' => $validated['siswa_id'],
+            'ekskul_id' => $validated['ekskul_id'],
+            // 'tanggal_daftar' is not updated, keeping it as is
+        ]);
 
         return new PendaftaranResource(true, 'Pendaftaran Updated Successfully', $pendaftaran);
     }

@@ -38,3 +38,5 @@ Route::get('/riwayat-kegiatan/{ekskul_id}', [KegiatanController::class, 'rekap']
 Route::apiResource('absensi-tutor', AbsensiTutorController::class);
 Route::apiResource('nilais',NilaiController::class);
 Route::apiResource('kegiatan', KegiatanController::class);
+Route::apiResource('pendaftaran', \App\Http\Controllers\Api\PendaftaranController::class);
+Route::get('/pendaftaranByEkskul/{ekskul_id}', [\App\Http\Controllers\Api\PendaftaranController::class, 'showByEkskul']);
