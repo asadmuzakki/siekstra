@@ -96,7 +96,7 @@ class KegiatanController extends Controller
         if (!$kegiatan) {
             return new KegiatanResource(false, 'Kegiatan Not Found', null);
         }
-
+        $kegiatan->load('details', 'ekskul');
         return new KegiatanResource(true, 'Kegiatan Found', $kegiatan);
     }
 
