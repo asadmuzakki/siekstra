@@ -20,8 +20,8 @@ class Siswa extends Model
      public function wali() {
         return $this->belongsTo(User::class, 'wali_murid_id');
     }
-    public function nilais() {
-        return $this->hasMany(Nilai::class);
+    public function detailNilais() {
+        return $this->hasMany(DetailNilai::class);
     }
     public function pendaftarans() {
         return $this->hasMany(Pendaftaran::class);
