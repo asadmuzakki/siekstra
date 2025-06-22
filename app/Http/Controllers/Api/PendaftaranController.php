@@ -41,9 +41,9 @@ class PendaftaranController extends Controller
         $pendaftaran = Pendaftaran::create([
             'siswa_id' => $validated['siswa_id'],
             'ekskul_id' => $validated['ekskul_id'],
-            'tanggal_daftar' => Carbon::today(),
+            'tanggal_pendaftaran' => Carbon::today(),
         ]);
-
+        $pendaftaran->load('ekskul', 'siswa'); // Eager load related models
         return new PendaftaranResource(true, 'Pendaftaran Created Successfully', $pendaftaran);
     }
 
@@ -80,7 +80,7 @@ class PendaftaranController extends Controller
         $pendaftaran->update([
             'siswa_id' => $validated['siswa_id'],
             'ekskul_id' => $validated['ekskul_id'],
-            // 'tanggal_daftar' is not updated, keeping it as is
+            'tanggal_pendaftaran' => Carbon::today(),
         ]);
 
         return new PendaftaranResource(true, 'Pendaftaran Updated Successfully', $pendaftaran);
