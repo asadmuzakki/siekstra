@@ -17,7 +17,7 @@ class Siswa extends Model
         'email_ortu',
         'wali_murid_id'
     ];
-     public function wali() {
+    public function wali() {
         return $this->belongsTo(User::class, 'wali_murid_id');
     }
     public function detailNilais() {

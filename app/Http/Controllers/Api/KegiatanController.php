@@ -110,17 +110,34 @@ class KegiatanController extends Controller
         if (!$kegiatan) {
             return new KegiatanResource(false, 'Kegiatan Not Found', null);
         }
-
         $validated = $request->validate([
-            'siswa_id' => 'required|exists:siswas,id',
             'ekskul_id' => 'required|exists:ekskuls,id',
             'nama_kegiatan' => 'required|string|max:100',
             'kategori' => 'required|string|max:50',
             'tingkat' => 'required|string|max:50',
             'tanggal_kegiatan' => 'required|date',
+            'absensis' => 'sometimes|array',
+            'absensis.*.siswa_id' => 'sometimes|required|exists:siswas,id',
+            'absensis.*.status' => 'sometimes|required|in:Hadir,Sakit,Izin,Alpha',
+            'absensis.*.keterangan' => 'nullable|string',
         ]);
-
-        $kegiatan->update($validated);
+        $kegiatan->update([
+            'ekskul_id' => $validated['ekskul_id'],
+            'nama_kegiatan' => $validated['nama_kegiatan'],
+            'kategori' => $validated['kategori'],
+            'tingkat' => $validated['tingkat'],
+            'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
+        ]);
+        // Hapus detail absensi lama
+        $kegiatan->details()->delete();
+        foreach ($validated['absensis'] as $absensiData) {
+            $kegiatan->details()->create([
+                'siswa_id' => $absensiData['siswa_id'],
+                'status' => $absensiData['status'],
+                'keterangan' => $absensiData['keterangan'] ?? null,
+            ]);
+        }
+        $kegiatan->load('details');
 
         return new KegiatanResource(true, 'Kegiatan Updated Successfully', $kegiatan);
     }
