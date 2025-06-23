@@ -45,7 +45,8 @@ class AbsensiTutorController extends Controller
 
         if (!$absensiTutor) {
             return new AbsensiTutorResource(false, 'Absensi Tutor Not Found', null);
-        }
+        } 
+        $absensiTutor->load('tutor', 'ekskul'); // Eager load related models
 
         return new AbsensiTutorResource(true, 'Absensi Tutor Found', $absensiTutor);
     }

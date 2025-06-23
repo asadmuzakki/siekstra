@@ -128,8 +128,6 @@ class NilaiController extends Controller
                 $index_nilai = 'B';
             } elseif ($nilai_akhir >= 80 && $nilai_akhir <= 85) {
                 $index_nilai = 'C';
-            } else {
-                $index_nilai = 'D';
             }
 
             $nilai->details()->create([
