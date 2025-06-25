@@ -68,9 +68,16 @@ class AbsensiTutorController extends Controller
             'ekskul_id' => 'required|exists:ekskuls,id',
             'tanggal' => 'required|date',
             'status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
+            'keterangan' => 'nullable|string',
         ]);
 
-        $absensiTutor->update($validated);
+        $absensiTutor->update([
+            'tutor_id' => $validated['tutor_id'],
+            'ekskul_id' => $validated['ekskul_id'],
+            'tanggal' => $validated['tanggal'],
+            'status' => $validated['status'],
+            'keterangan' => $validated['keterangan'] ?? null,
+        ]);
 
         return new AbsensiTutorResource(true, 'Absensi Tutor Updated Successfully', $absensiTutor);
     }
