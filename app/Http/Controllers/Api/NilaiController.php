@@ -14,8 +14,9 @@ class NilaiController extends Controller
      */
     public function index()
     {
-        $nilais = Nilai::all();
-        $nilais->load('details'); // Eager load details relationship
+        $nilais = Nilai::with('details') // Eager load the details relationship
+            ->orderBy('created_at', 'desc') // Sort by date descending
+            ->get();
         return new NilaiResource(true, 'List of Nilai', $nilais);
     }
 
