@@ -14,7 +14,7 @@ class AbsensiTutorController extends Controller
      */
     public function index()
     {
-        $absensiTutors = AbsensiTutor::all();
+        $absensiTutors = AbsensiTutor::all()->orderBy('id', 'asc');
         $absensiTutors->load('tutor', 'ekskul'); // Eager load related models
         return new AbsensiTutorResource(true, 'List of Absensi Tutor', $absensiTutors);
     }
