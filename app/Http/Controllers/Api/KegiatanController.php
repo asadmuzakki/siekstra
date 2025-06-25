@@ -14,8 +14,10 @@ class KegiatanController extends Controller
      */
     public function index()
     {
-        $kegiatans = Kegiatan::all();
-        $kegiatans->load('details', 'ekskul');
+        $kegiatans = Kegiatan::with('details', 'ekskul') // Eager load the details and ekskul relationships
+            ->orderBy('created_at', 'asc') // Sort by date ascending
+            ->get();
+        // $kegiatans->load('details', 'ekskul');
         return new KegiatanResource(true, 'List of Kegiatan', $kegiatans);
     }
     /**

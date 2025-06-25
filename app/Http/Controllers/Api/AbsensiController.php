@@ -14,8 +14,10 @@ class AbsensiController extends Controller
      */
     public function index()
     {
-        $absensis = Absensi::all();
-        $absensis->load('details');
+        $absensis = Absensi::with('details') // Eager load the details relationship
+            ->orderBy('created_at', 'asc') // Sort by date descending
+            ->get();
+        // $absensis->load('details');
         return new AbsensiResource(true, 'List of Absensi', $absensis);
     }
     /**
