@@ -75,8 +75,8 @@ class NilaiController extends Controller
      */
     public function show($id)
     {
-        $nilai = Nilai::find($id);
-        $nilai->load('details'); // Eager load details relationship
+        $nilai = Nilai::with('details.siswa')->find($id);
+        // $nilai->load('details.siswa'); // Eager load details relationship
         if (!$nilai) {
             return new NilaiResource(false, 'Nilai Not Found', null);
         }
