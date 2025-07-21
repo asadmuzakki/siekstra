@@ -23,9 +23,9 @@ class NilaiController extends Controller
     {
         if ($nilai_akhir >= 94 && $nilai_akhir <= 100) {
             return 'A';
-        } elseif ($nilai_akhir >= 86 && $nilai_akhir <= 93) {
+        } elseif ($nilai_akhir >= 86 && $nilai_akhir < 94) {
             return 'B';
-        } elseif ($nilai_akhir >= 80 && $nilai_akhir <= 85) {
+        } elseif ($nilai_akhir >= 80 && $nilai_akhir < 86) {
             return 'C';
         }
 
@@ -127,14 +127,7 @@ class NilaiController extends Controller
             $praktik = (float) $data['praktik'];
 
             $nilai_akhir = ($kehadiran * 0.4) + ($keaktifan * 0.3) + ($praktik * 0.3);
-
-            if ($nilai_akhir >= 94 && $nilai_akhir <= 100) {
-                $index_nilai = 'A';
-            } elseif ($nilai_akhir >= 86 && $nilai_akhir <= 93) {
-                $index_nilai = 'B';
-            } elseif ($nilai_akhir >= 80 && $nilai_akhir <= 85) {
-                $index_nilai = 'C';
-            }
+            $index_nilai = $this->getIndexNilai($nilai_akhir);
 
             $nilai->details()->create([
                 'siswa_id' => $data['siswa_id'],
