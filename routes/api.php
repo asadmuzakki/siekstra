@@ -25,18 +25,17 @@ Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(functi
     Route::get('/dashboard', function () {
         return response()->json(['message' => 'Selamat datang member!']);
     });
+    Route::apiResource('absensi', AbsensiController::class);
+    Route::get('/riwayat-absensi/{ekskul_id}', [AbsensiController::class, 'rekap']);
+    Route::get('/riwayat-kegiatan/{ekskul_id}', [KegiatanController::class, 'rekap']);
+    Route::apiResource('absensi-tutor', AbsensiTutorController::class);
+    Route::apiResource('nilais', NilaiController::class);
+    Route::apiResource('kegiatan', KegiatanController::class);
+    Route::apiResource('pendaftaran', \App\Http\Controllers\Api\PendaftaranController::class);
+    Route::get('/pendaftaranByEkskul/{ekskul_id}', [\App\Http\Controllers\Api\PendaftaranController::class, 'showByEkskul']);
     // Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
 });
 
 Route::post('/tes-absensi', [TesController::class, 'store']);
 Route::apiResource('siswas', SiswaController::class);
 Route::apiResource('ekskul', EkskulController::class);
-
-Route::apiResource('absensi', AbsensiController::class);
-Route::get('/riwayat-absensi/{ekskul_id}', [AbsensiController::class, 'rekap']);
-Route::get('/riwayat-kegiatan/{ekskul_id}', [KegiatanController::class, 'rekap']);
-Route::apiResource('absensi-tutor', AbsensiTutorController::class);
-Route::apiResource('nilais',NilaiController::class);
-Route::apiResource('kegiatan', KegiatanController::class);
-Route::apiResource('pendaftaran', \App\Http\Controllers\Api\PendaftaranController::class);
-Route::get('/pendaftaranByEkskul/{ekskul_id}', [\App\Http\Controllers\Api\PendaftaranController::class, 'showByEkskul']);
