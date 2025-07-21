@@ -15,11 +15,22 @@ class NilaiController extends Controller
     public function index()
     {
         $nilais = Nilai::with('details') // Eager load the details relationship
-            ->orderBy('created_at', 'desc') // Sort by date descending
+            ->orderBy('created_at', 'desc')
             ->get();
         return new NilaiResource(true, 'List of Nilai', $nilais);
     }
+    private function getIndexNilai(float $nilai_akhir): string
+    {
+        if ($nilai_akhir >= 94 && $nilai_akhir <= 100) {
+            return 'A';
+        } elseif ($nilai_akhir >= 86 && $nilai_akhir <= 93) {
+            return 'B';
+        } elseif ($nilai_akhir >= 80 && $nilai_akhir <= 85) {
+            return 'C';
+        }
 
+        return 'D'; // default jika di bawah 80
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -46,13 +57,7 @@ class NilaiController extends Controller
             $praktik = (float) $data['praktik'];
 
             $nilai_akhir = ($kehadiran * 0.4) + ($keaktifan * 0.3) + ($praktik * 0.3);
-            if ($nilai_akhir >= 94 && $nilai_akhir <= 100) {
-                $index_nilai = 'A';
-            } elseif ($nilai_akhir >= 86 && $nilai_akhir <= 93) {
-                $index_nilai = 'B';
-            } elseif ($nilai_akhir >= 80 && $nilai_akhir <= 85) {
-                $index_nilai = 'C';
-            }
+            $index_nilai = $this->getIndexNilai($nilai_akhir);
             // Simpan ke tabel nilai (contoh: model Nilai)
             $nilai->details()->create([
                 'siswa_id' => $data['siswa_id'],
