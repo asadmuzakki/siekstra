@@ -91,7 +91,7 @@ class NilaiController extends Controller
     // buat showByIdEkskul
     public function showByEkskul($ekskulId)
     {
-        $nilai = Nilai::with('details.siswa')->where('ekskul_id', $ekskulId)->first();
+        $nilai = Nilai::with('details')->where('ekskul_id', $ekskulId)->first();
 
         if (!$nilai) {
             return new NilaiResource(false, 'Nilai Not Found', null);
