@@ -34,8 +34,9 @@ Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(functi
     Route::apiResource('pendaftaran', \App\Http\Controllers\Api\PendaftaranController::class);
     Route::get('/pendaftaranByEkskul/{ekskul_id}', [\App\Http\Controllers\Api\PendaftaranController::class, 'showByEkskul']);
     Route::apiResource('siswas', SiswaController::class);
-    Route::apiResource('ekskul', EkskulController::class);
+    Route::get('/ekskulByUser/{userId}', [EkskulController::class, 'showByUserId']);
     // Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
 });
 
 Route::post('/tes-absensi', [TesController::class, 'store']);
+Route::apiResource('ekskul', EkskulController::class);

@@ -50,6 +50,17 @@ class EkskulController extends Controller
 
         return new EkskulResource(true, 'Ekskul Found', $ekskul);
     }
+    // buat method untuk menampilkan ekskul berdasarkan user_id
+    public function showByUserId($userId)
+    {
+        $ekskuls = Ekskul::where('tutor_id', $userId)->get();
+
+        if ($ekskuls->isEmpty()) {
+            return new EkskulResource(false, 'No Ekskul found for this user', null);
+        }
+
+        return new EkskulResource(true, 'Ekskul Found', $ekskuls);
+    }
 
     /**
      * Update the specified resource in storage.
