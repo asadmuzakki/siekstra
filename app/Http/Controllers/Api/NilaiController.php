@@ -89,13 +89,13 @@ class NilaiController extends Controller
         return new NilaiResource(true, 'Nilai Found', $nilai);
     }
     // buat showByIdEkskul
-    public function showByEkskul($ekskulId)
+    public function showByEkskul($ekskulId, $total_page)
     {
         // $nilai = Nilai::with('details.siswa')->where('ekskul_id', $ekskulId)->first();
         $nilais = Nilai::with('details') // Eager load the details relationship
             ->where('ekskul_id', $ekskulId)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate($total_page);
 
         if (!$nilais) {
             return new NilaiResource(false, 'Nilai Not Found', null);
