@@ -88,6 +88,17 @@ class NilaiController extends Controller
 
         return new NilaiResource(true, 'Nilai Found', $nilai);
     }
+    // buat showByIdEkskul
+    public function showByEkskul($ekskulId)
+    {
+        $nilai = Nilai::with('details.siswa')->where('ekskul_id', $ekskulId)->first();
+
+        if (!$nilai) {
+            return new NilaiResource(false, 'Nilai Not Found', null);
+        }
+
+        return new NilaiResource(true, 'Nilai Found', $nilai);
+    }
 
     /**
      * Update the specified resource in storage.
