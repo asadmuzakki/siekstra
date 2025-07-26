@@ -20,6 +20,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/dashboard', function () {
         return response()->json(['message' => 'Selamat datang admin!']);
     });
+    Route::apiResource('siswas', SiswaController::class);
 });
 Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(function () {
     Route::get('/dashboard', function () {
