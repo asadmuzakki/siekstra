@@ -14,7 +14,9 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        $siswas = Siswa::all();
+        $siswas = Siswa::with('pendaftarans.ekskul') // Eager load the ekskuls relationship
+            ->orderBy('created_at', 'desc')
+            ->get();
         return new SiswaResource(true, 'List of Siswas', $siswas);
     }
 
@@ -29,6 +31,7 @@ class SiswaController extends Controller
             'kelas' => 'required|string|max:50',
             'nama_ortu' => 'required|string|max:100',
             'email_ortu' => 'required|email|max:100',
+            'jenis_kelamin' => 'required|string|max:10', // Added jenis_kelamin validation
         ]);
 
         $siswa = Siswa::create($validated);
@@ -67,6 +70,7 @@ class SiswaController extends Controller
             'kelas' => 'required|string|max:50',
             'nama_ortu' => 'required|string|max:100',
             'email_ortu' => 'required|email|max:100',
+            'jenis_kelamin' => 'required|string|max:10', // Added jenis_kelamin validation
         ]);
 
         $siswa->update($validated);

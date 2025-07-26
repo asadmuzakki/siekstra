@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('siswas', function (Blueprint $table) {
             $table->id(); // Primary key
             $table->string('nama', 100); // Nama siswa
+            $table->string('jenis_kelamin', 10); // Jenis kelamin siswa
             $table->string('nis', 20)->unique(); // Nomor Induk Siswa
             $table->string('kelas', 50); // Kelas siswa
             $table->string('nama_ortu', 100); // Nama orang tua siswa

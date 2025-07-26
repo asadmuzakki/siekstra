@@ -18,21 +18,24 @@ class SiswaSeeder extends Seeder
                 'nis' => '1234567890',
                 'kelas' => '10A',
                 'nama_ortu' => 'Bapak Fauzi',
-                'email_ortu' => 'fauzi@example.com'
+                'email_ortu' => 'fauzi@example.com',
+                'jenis_kelamin' => 'Laki-laki', // Added jenis_kelamin field
             ],
             [
                 'nama' => 'Siti Aminah',
                 'nis' => '1234567891',
                 'kelas' => '10B',
                 'nama_ortu' => 'Ibu Aminah',
-                'email_ortu' => 'aminah@example.com'
+                'email_ortu' => 'aminah@example.com',
+                'jenis_kelamin' => 'Perempuan', // Added jenis_kelamin field
             ],
             [
                 'nama' => 'Budi Santoso',
                 'nis' => '1234567892',
                 'kelas' => '11A',
                 'nama_ortu' => 'Bapak Santoso',
-                'email_ortu' => 'santoso@example.com'
+                'email_ortu' => 'santoso@example.com',
+                'jenis_kelamin' => 'Laki-laki', // Added jenis_kelamin field
             ],
             [
                 'nama' => 'Dewi Lestari',
@@ -40,6 +43,7 @@ class SiswaSeeder extends Seeder
                 'kelas' => '11B',
                 'nama_ortu' => 'Ibu Lestari',
                 'email_ortu' => 'lestari@example.com',
+                'jenis_kelamin' => 'Perempuan', // Added jenis_kelamin field
             ],
         ]);
     }

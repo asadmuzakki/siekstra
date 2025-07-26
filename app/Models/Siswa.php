@@ -15,7 +15,8 @@ class Siswa extends Model
         'kelas',
         'nama_ortu',
         'email_ortu',
-        'wali_murid_id'
+        'wali_murid_id',
+        'jenis_kelamin', // Added jenis_kelamin field
     ];
     public function wali() {
         return $this->belongsTo(User::class, 'wali_murid_id');
