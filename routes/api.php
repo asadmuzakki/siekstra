@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\AbsensiController;
 use App\Http\Controllers\Api\KegiatanController;
 use App\Http\Controllers\Api\AbsensiTutorController;
 use App\Http\Controllers\Api\NilaiController;
+use App\Http\Controllers\Api\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -21,6 +22,17 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
         return response()->json(['message' => 'Selamat datang admin!']);
     });
     Route::apiResource('siswas', SiswaController::class);
+    Route::post('/add-tutor', [UserController::class, 'addTutor']);
+    Route::delete('/delete-tutor/{id}', [UserController::class, 'deleteTutor']);
+    Route::put('/update-tutor/{id}', [UserController::class, 'updateTutor']);
+    Route::get('/getTutor/{id}', [UserController::class, 'getTutor']);
+    Route::get('/getTutors', [UserController::class, 'getTutors']);
+    Route::post('/add-wali-murid', [UserController::class, 'addWaliMurid']);
+    Route::get('/getWaliMurid/{id}', [UserController::class, 'getWaliMurid']);
+    Route::get('/getWaliMurids', [UserController::class, 'getWaliMurids']);
+    Route::put('/update-wali-murid/{id}', [UserController::class, 'updateWaliMurid']);
+    Route::delete('/delete-wali-murid/{id}', [UserController::class, 'deleteWaliMurid']);
+    Route::apiResource('ekskul', EkskulController::class);
 });
 Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(function () {
     Route::get('/dashboard', function () {
