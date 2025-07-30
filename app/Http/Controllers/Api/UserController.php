@@ -155,9 +155,15 @@ class UserController extends Controller
     // Method untuk mendapatkan daftar wali murid
     public function getWaliMurids()
     {
-        $waliMurids = User::role('wali_murid')->get();
-        $total_anak = Siswa::where('email_ortu', $waliMurids->pluck('email'))->count();
-        return response()->json(['wali_murids' => $waliMurids, 'total_anak' => $total_anak], 200);
+        $waliMurids = User::role('wali_murid') // Filter hanya untuk wali murid
+            ->withCount('anak') // Hitung jumlah anak
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'List of Wali Murids with Total Anak',
+            'data' => $waliMurids,
+        ], 200);
     }
     // Method untuk mendapatkan detail wali murid
     public function getWaliMurid($id)

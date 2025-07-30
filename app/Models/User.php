@@ -47,4 +47,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function anak()
+    {
+        return $this->hasMany(\App\Models\Siswa::class, 'email_ortu', 'email');
+    }
 }
