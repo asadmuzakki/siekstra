@@ -156,7 +156,8 @@ class UserController extends Controller
     public function getWaliMurids()
     {
         $waliMurids = User::role('wali_murid')->get();
-        return response()->json(['wali_murids' => $waliMurids], 200);
+        $total_anak = Siswa::where('email_ortu', $waliMurids->pluck('email'))->count();
+        return response()->json(['wali_murids' => $waliMurids, 'total_anak' => $total_anak], 200);
     }
     // Method untuk mendapatkan detail wali murid
     public function getWaliMurid($id)
