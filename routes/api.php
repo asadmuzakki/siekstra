@@ -25,12 +25,14 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/add-tutor', [UserController::class, 'addTutor']);
     Route::delete('/delete-tutor/{id}', [UserController::class, 'deleteTutor']);
     Route::put('/update-tutor/{id}', [UserController::class, 'updateTutor']);
+    Route::patch('/update-tutor/{id}', [UserController::class, 'updateTutor']);
     Route::get('/getTutor/{id}', [UserController::class, 'getTutor']);
     Route::get('/getTutors', [UserController::class, 'getTutors']);
     Route::post('/add-wali-murid', [UserController::class, 'addWaliMurid']);
     Route::get('/getWaliMurid/{id}', [UserController::class, 'getWaliMurid']);
     Route::get('/getWaliMurids', [UserController::class, 'getWaliMurids']);
     Route::put('/update-wali-murid/{id}', [UserController::class, 'updateWaliMurid']);
+    Route::patch('/update-wali-murid/{id}', [UserController::class, 'updateWaliMurid']);
     Route::delete('/delete-wali-murid/{id}', [UserController::class, 'deleteWaliMurid']);
     Route::apiResource('ekskul', EkskulController::class);
 });
