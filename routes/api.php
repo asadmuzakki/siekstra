@@ -35,6 +35,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::patch('/update-wali-murid/{id}', [UserController::class, 'updateWaliMurid']);
     Route::delete('/delete-wali-murid/{id}', [UserController::class, 'deleteWaliMurid']);
     Route::apiResource('ekskul', EkskulController::class);
+    Route::apiResource('absensi-tutor', AbsensiTutorController::class);
 });
 Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(function () {
     Route::get('/dashboard', function () {
