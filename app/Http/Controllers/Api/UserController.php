@@ -75,7 +75,11 @@ class UserController extends Controller
     public function getTutors()
     {
         $tutors = User::role('tutor')->get();
-        return response()->json(['data' => $tutors], 200);
+        return response()->json([
+            'success' => true,
+            'message' => 'List of Tutors',
+            'data' => $tutors,
+        ], 200);
     }
     // Method untuk mendapatkan detail tutor
     public function getTutor($id)
