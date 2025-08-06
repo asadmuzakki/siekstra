@@ -19,4 +19,8 @@ class Ekskul extends Model
     {
         return $this->belongsTo(User::class, 'tutor_id');
     }
+    public function pendaftarans()
+    {
+        return $this->hasMany(Pendaftaran::class);
+    }
 }

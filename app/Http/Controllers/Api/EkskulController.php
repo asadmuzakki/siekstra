@@ -14,7 +14,9 @@ class EkskulController extends Controller
      */
     public function index()
     {
-        $ekskuls = Ekskul::all();
+        $ekskuls = Ekskul::with('tutor')
+            ->withCount('pendaftarans')
+            ->get();
         return new EkskulResource(true, 'List of Ekskul', $ekskuls);
     }
 
@@ -42,7 +44,7 @@ class EkskulController extends Controller
      */
     public function show($id)
     {
-        $ekskul = Ekskul::find($id);
+        $ekskul = Ekskul::with('tutor')->find($id);
 
         if (!$ekskul) {
             return new EkskulResource(false, 'Ekskul Not Found', null);
