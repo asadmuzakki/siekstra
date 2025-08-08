@@ -47,27 +47,36 @@ class CloudinaryService extends ServiceProvider
 
     public static function deleteImageByUrl($url)
     {
-        $publicId = self::extractPublicIdFromUrl($url);
+        if (!$url) return false;
 
-        if (!$publicId) {
-            return ['error' => 'URL tidak valid'];
-        }
+        // Ambil public_id dari URL
+        $parts = parse_url($url);
+        $path = ltrim($parts['path'], '/'); // image/upload/v123/laravel_uploads/abcd1234.jpg
+        $pathParts = explode('/', $path);
 
-        return self::deleteImageById($publicId);
-    }
+        // Ambil semua setelah "upload/"
+        $uploadIndex = array_search('upload', $pathParts);
+        $publicIdWithExt = implode('/', array_slice($pathParts, $uploadIndex + 2));
 
-    private static function extractPublicIdFromUrl($url)
-    {
-        $urlPath = parse_url($url, PHP_URL_PATH);
-        $parts = explode('/', $urlPath);
+        // Hilangkan ekstensi file
+        $publicId = pathinfo($publicIdWithExt, PATHINFO_DIRNAME) . '/' . pathinfo($publicIdWithExt, PATHINFO_FILENAME);
+        $publicId = trim($publicId, '/');
 
-        $uploadIndex = array_search('upload', $parts);
-        if ($uploadIndex === false || !isset($parts[$uploadIndex + 1])) {
-            return null;
-        }
+        // Kirim request delete ke Cloudinary
+        $timestamp = time();
+        $apiSecret = env('CLOUDINARY_API_SECRET');
+        $apiKey = env('CLOUDINARY_API_KEY');
+        $cloudName = env('CLOUDINARY_CLOUD_NAME');
 
-        $publicIdWithExt = implode('/', array_slice($parts, $uploadIndex + 1));
+        $signature = sha1("public_id={$publicId}&timestamp={$timestamp}{$apiSecret}");
 
-        return pathinfo($publicIdWithExt, PATHINFO_DIRNAME) . '/' . pathinfo($publicIdWithExt, PATHINFO_FILENAME);
+        $response = Http::asForm()->post("https://api.cloudinary.com/v1_1/{$cloudName}/image/destroy", [
+            'public_id' => $publicId,
+            'timestamp' => $timestamp,
+            'api_key' => $apiKey,
+            'signature' => $signature
+        ]);
+
+        return $response->json();
     }
 }
