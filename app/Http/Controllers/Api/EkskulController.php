@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Http\Resources\EkskulResource;
 use Illuminate\Http\Request;
+use App\Providers\CloudinaryService;
 
 class EkskulController extends Controller
 {
@@ -32,9 +33,18 @@ class EkskulController extends Controller
             'tempat' => 'required|string|max:100',
             'tutor_id' => 'required|exists:users,id',
             'status' => 'required|in:aktif,nonaktif', // Assuming status can be Aktif or Nonaktif
+            'foto' => 'nullable|image|max:2048', // Optional image upload
         ]);
-
-        $ekskul = Ekskul::create($validated);
+        $fotoUrl = CloudinaryService::uploadImage($request->file('foto'));
+        $ekskul = Ekskul::create([
+            'nama_ekskul' => $validated['nama_ekskul'],
+            'deskripsi' => $validated['deskripsi'] ?? null,
+            'jadwal' => $validated['jadwal'],
+            'tempat' => $validated['tempat'],
+            'tutor_id' => $validated['tutor_id'],
+            'status' => $validated['status'],
+            'foto_url' => $fotoUrl['secure_url'] ?? null, // Store the secure URL from Cloudinary
+        ]);
 
         return new EkskulResource(true, 'Ekskul Created Successfully', $ekskul);
     }
@@ -81,9 +91,34 @@ class EkskulController extends Controller
             'jadwal' => 'required|string|max:100',
             'tempat' => 'required|string|max:100',
             'tutor_id' => 'required|exists:users,id',
+            'status' => 'required|in:aktif,nonaktif',
+            'foto' => 'nullable|image|max:2048',
         ]);
 
-        $ekskul->update($validated);
+        // Default foto lama
+        $fotoUrl = $ekskul->foto_url;
+
+        // Jika ada foto baru
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama di Cloudinary
+            if ($ekskul->foto_url) {
+                CloudinaryService::deleteImageByUrl($ekskul->foto_url);
+            }
+
+            // Upload foto baru
+            $uploadResult = CloudinaryService::uploadImage($request->file('foto'));
+            $fotoUrl = $uploadResult['secure_url'] ?? $fotoUrl;
+        }
+
+        $ekskul->update([
+            'nama_ekskul' => $validated['nama_ekskul'],
+            'deskripsi' => $validated['deskripsi'] ?? null,
+            'jadwal' => $validated['jadwal'],
+            'tempat' => $validated['tempat'],
+            'tutor_id' => $validated['tutor_id'],
+            'status' => $validated['status'],
+            'foto_url' => $fotoUrl,
+        ]);
 
         return new EkskulResource(true, 'Ekskul Updated Successfully', $ekskul);
     }
@@ -98,7 +133,10 @@ class EkskulController extends Controller
         if (!$ekskul) {
             return new EkskulResource(false, 'Ekskul Not Found', null);
         }
-
+        // Hapus foto di Cloudinary jika ada
+        if ($ekskul->foto_url) {
+            CloudinaryService::deleteImageByUrl($ekskul->foto_url);
+        }
         $ekskul->delete();
 
         return new EkskulResource(true, 'Ekskul Deleted Successfully', null);

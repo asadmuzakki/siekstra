@@ -8,6 +8,7 @@ class Ekskul extends Model
 {
     protected $fillable = [
         'nama_ekskul',
+        'foto_url',
         'deskripsi',
         'jadwal',
         'tempat',

@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id(); // Primary key
             $table->string('nama_ekskul');
             $table->text('deskripsi')->nullable();
+            $table->string('foto_url')->nullable();
             $table->date('jadwal');
             $table->string('tempat');
             $table->foreignId('tutor_id')->constrained('users', 'id')->onDelete('cascade')->onUpdate('cascade');
