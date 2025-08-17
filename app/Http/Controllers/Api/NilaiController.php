@@ -234,7 +234,7 @@ class NilaiController extends Controller
             ->when($sortBy === 'ekskul', function ($query) use ($sortOrder) {
                 $query->join('nilais', 'detail_nilais.nilai_id', '=', 'nilais.id')
                     ->join('ekskuls', 'nilais.ekskul_id', '=', 'ekskuls.id')
-                    ->orderBy('ekskuls.nama', $sortOrder);
+                    ->orderBy('ekskuls.nama_ekskul', $sortOrder);
             }, function ($query) use ($sortBy, $sortOrder) {
                 $query->orderBy($sortBy, $sortOrder); // Default sorting
             })
