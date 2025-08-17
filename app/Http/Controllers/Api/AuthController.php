@@ -80,4 +80,46 @@ class AuthController extends Controller
             'role' => $user->getRoleNames(),
         ]);
     }
+
+    public function editProfile(Request $request)
+    {
+        $user = Auth::user(); // Mendapatkan pengguna yang sedang login
+
+        // Validasi input
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        // Update data pengguna
+        if ($request->has('name')) {
+            $user->name = $validated['name'];
+        }
+
+        if ($request->has('email')) {
+            $user->email = $validated['email'];
+        }
+
+        if ($request->has('password')) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user,
+        ]);
+    }
+
+    public function getProfile()
+    {
+        $user = Auth::user(); // Mendapatkan pengguna yang sedang login
+
+        return response()->json([
+            'message' => 'Profile retrieved successfully',
+            'user' => $user,
+        ]);
+    }
 }
