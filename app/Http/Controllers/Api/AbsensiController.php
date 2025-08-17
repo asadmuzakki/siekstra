@@ -218,7 +218,7 @@ class AbsensiController extends Controller
             ->when($sortBy === 'ekskul', function ($query) use ($sortOrder) {
                 $query->join('absensis', 'detail_absensis.absensi_id', '=', 'absensis.id')
                     ->join('ekskuls', 'absensis.ekskul_id', '=', 'ekskuls.id')
-                    ->orderBy('ekskuls.nama', $sortOrder);
+                    ->orderBy('ekskuls.nama_ekskul', $sortOrder);
             }, function ($query) use ($sortBy, $sortOrder) {
                 $query->orderBy($sortBy, $sortOrder); // Default sorting
             })
