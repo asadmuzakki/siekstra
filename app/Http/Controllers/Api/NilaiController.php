@@ -253,7 +253,7 @@ class NilaiController extends Controller
                 'nilai_id' => $detail->nilai_id,
                 'tanggal' => $detail->nilai->tanggal,
                 'ekskul_id' => $detail->nilai->ekskul_id,
-                'nama_ekskul' => $detail->nilai->ekskul->nama ?? null,
+                'nama_ekskul' => $detail->nilai->ekskul->nama_ekskul ?? null,
                 'siswa_id' => $detail->siswa->id,
                 'nama_siswa' => $detail->siswa->nama,
                 'kelas' => $detail->siswa->kelas,

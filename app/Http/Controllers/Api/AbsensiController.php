@@ -237,7 +237,7 @@ class AbsensiController extends Controller
                 'absensi_id' => $detail->absensi_id,
                 'tanggal' => $detail->absensi->tanggal,
                 'ekskul_id' => $detail->absensi->ekskul_id,
-                'nama_ekskul' => $detail->absensi->ekskul->nama ?? null,
+                'nama_ekskul' => $detail->absensi->ekskul->nama_ekskul ?? null,
                 'siswa_id' => $detail->siswa->id,
                 'nama_siswa' => $detail->siswa->nama,
                 'kelas' => $detail->siswa->kelas,
