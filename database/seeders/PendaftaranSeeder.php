@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Pendaftaran;
+use Illuminate\Support\Carbon;
 
 class PendaftaranSeeder extends Seeder
 {
@@ -19,18 +20,22 @@ class PendaftaranSeeder extends Seeder
             [
                 'siswa_id' => 1,
                 'ekskul_id' => 1,
+                'tanggal_pendaftaran' => Carbon::today()
             ],
             [
                 'siswa_id' => 2,
                 'ekskul_id' => 1,
+                'tanggal_pendaftaran' => Carbon::today()
             ],
             [
                 'siswa_id' => 1,
                 'ekskul_id' => 2,
+                'tanggal_pendaftaran' => Carbon::today()
             ],
             [
                 'siswa_id' => 3,
                 'ekskul_id' => 3,
+                'tanggal_pendaftaran' => Carbon::today()
             ],
         ];
 
