@@ -25,8 +25,8 @@ class AbsensiController extends Controller
     public function rekap($ekskul_id)
     {
         $absensis = Absensi::with('details')
-        ->where('ekskul_id', $ekskul_id)
-        ->get();
+            ->where('ekskul_id', $ekskul_id)
+            ->get();
 
         $rekap = $absensis->map(function ($absensi) {
             $total = $absensi->details->count();
@@ -159,5 +159,93 @@ class AbsensiController extends Controller
         $absensi->delete();
 
         return new AbsensiResource(true, 'Absensi Deleted Successfully', null);
+    }
+
+    public function showBySiswaId($siswaId, $tahun = null)
+    {
+        // Ambil absensi berdasarkan siswa_id dari relasi details
+        $absensis = Absensi::whereHas('details', function ($query) use ($siswaId) {
+            $query->where('siswa_id', $siswaId);
+        })
+            ->when($tahun, function ($query) use ($tahun) {
+                $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun jika diberikan
+            })
+            ->with([
+                'details' => function ($query) use ($siswaId) {
+                    $query->where('siswa_id', $siswaId);
+                }
+            ])
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        if ($absensis->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No Absensi Found for the Given Siswa and Year',
+            ], 404);
+        }
+
+        return new AbsensiResource(true, 'Absensi Found for Siswa', $absensis);
+    }
+
+    public function indexByAbsensi(Request $request)
+    {
+        // Ambil parameter sorting dan filter dari query string
+        $sortBy = $request->query('sort_by', 'absensi_id'); // Default: absensi_id
+        $sortOrder = $request->query('sort_order', 'desc'); // Default: desc
+        $tahun = $request->query('tahun'); // Filter berdasarkan tahun
+
+        // Validasi parameter sorting
+        $allowedSortBy = ['kelas', 'ekskul', 'absensi_id'];
+        if (!in_array($sortBy, $allowedSortBy)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid sort_by parameter. Allowed values: kelas, ekskul, absensi_id',
+            ], 400);
+        }
+
+        // Ambil data dari tabel absensi_details dengan relasi siswa dan absensi
+        $detailAbsensis = \App\Models\DetailAbsensi::with(['siswa', 'absensi.ekskul'])
+            ->when($tahun, function ($query) use ($tahun) {
+                $query->whereHas('absensi', function ($query) use ($tahun) {
+                    $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun
+                });
+            })
+            ->when($sortBy === 'kelas', function ($query) use ($sortOrder) {
+                $query->join('siswas', 'detail_absensis.siswa_id', '=', 'siswas.id')
+                    ->orderBy('siswas.kelas', $sortOrder);
+            })
+            ->when($sortBy === 'ekskul', function ($query) use ($sortOrder) {
+                $query->join('absensis', 'detail_absensis.absensi_id', '=', 'absensis.id')
+                    ->join('ekskuls', 'absensis.ekskul_id', '=', 'ekskuls.id')
+                    ->orderBy('ekskuls.nama', $sortOrder);
+            }, function ($query) use ($sortBy, $sortOrder) {
+                $query->orderBy($sortBy, $sortOrder); // Default sorting
+            })
+            ->get();
+
+        if ($detailAbsensis->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No Absensi Found',
+            ], 404);
+        }
+
+        // Format data untuk ditampilkan per absensi
+        $result = $detailAbsensis->map(function ($detail) {
+            return [
+                'absensi_id' => $detail->absensi_id,
+                'tanggal' => $detail->absensi->tanggal,
+                'ekskul_id' => $detail->absensi->ekskul_id,
+                'nama_ekskul' => $detail->absensi->ekskul->nama ?? null,
+                'siswa_id' => $detail->siswa->id,
+                'nama_siswa' => $detail->siswa->nama,
+                'kelas' => $detail->siswa->kelas,
+                'status' => $detail->status,
+                'keterangan' => $detail->keterangan,
+            ];
+        });
+
+        return new AbsensiResource(true, 'List of Absensi by Detail', $result);
     }
 }

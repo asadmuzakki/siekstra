@@ -19,6 +19,8 @@ class EkskulSeeder extends Seeder
             'tempat' => 'Lapangan Basket Sekolah',
             'tutor_id' => 2, // ID tutor yang sudah ada di tabel users
             'status' => 'aktif',
+            'kelas_min' => 1, // Kelas minimal yang diperbolehkan
+            'kelas_max' => 6, // Kelas maksimal yang diperbolehkan
         ]);
 
         Ekskul::create([
@@ -28,6 +30,8 @@ class EkskulSeeder extends Seeder
             'tempat' => 'Ruang Musik',
             'tutor_id' => 2, // ID tutor yang sudah ada di tabel users
             'status' => 'aktif',
+            'kelas_min' => 3,
+            'kelas_max' => 5,
         ]);
 
         Ekskul::create([
@@ -37,6 +41,8 @@ class EkskulSeeder extends Seeder
             'tempat' => 'Lab Komputer',
             'tutor_id' => 2, // ID tutor yang sudah ada di tabel users
             'status' => 'nonaktif',
+            'kelas_min' => 2,
+            'kelas_max' => 4,
         ]);
     }
 }

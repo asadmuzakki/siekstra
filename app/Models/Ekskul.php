@@ -13,7 +13,9 @@ class Ekskul extends Model
         'jadwal',
         'tempat',
         'tutor_id',
-        'status'
+        'status',
+        'kelas_min',
+        'kelas_max'
     ];
 
     public function tutor()

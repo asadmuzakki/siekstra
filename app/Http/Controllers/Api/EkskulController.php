@@ -141,4 +141,66 @@ class EkskulController extends Controller
 
         return new EkskulResource(true, 'Ekskul Deleted Successfully', null);
     }
+
+    public function ekskulForWali()
+    {
+        $wali = auth()->user();
+        $siswaList = $wali->siswa;
+
+        $result = [];
+
+        foreach ($siswaList as $siswa) {
+            // Ambil angka kelas dari string (contoh: "5 Mushab bin Umair" -> 5)
+            preg_match('/^\d+/', $siswa->kelas, $matches);
+            $tingkat = $matches[0] ?? null;
+
+            if ($tingkat) {
+                $ekskuls = Ekskul::where('kelas_min', '<=', $tingkat)
+                    ->where('kelas_max', '>=', $tingkat)
+                    ->get();
+            } else {
+                $ekskuls = collect();
+            }
+
+            $result[] = [
+                'siswa' => $siswa->nama,
+                'kelas' => $siswa->kelas,
+                'ekskul' => $ekskuls
+            ];
+        }
+
+        return new EkskulResource(true, 'Ekskul Found', $result);
+    }
+
+    public function showBySiswaId($siswaId)
+    {
+        // Cari siswa berdasarkan ID
+        $siswa = \App\Models\Siswa::find($siswaId);
+
+        if (!$siswa) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Siswa Not Found',
+            ], 404);
+        }
+
+        // Ambil angka kelas dari string (contoh: "5 Mushab bin Umair" -> 5)
+        preg_match('/^\d+/', $siswa->kelas, $matches);
+        $tingkat = $matches[0] ?? null;
+
+        if ($tingkat) {
+            // Cari ekskul berdasarkan tingkat kelas siswa
+            $ekskuls = Ekskul::where('kelas_min', '<=', $tingkat)
+                ->where('kelas_max', '>=', $tingkat)
+                ->get();
+        } else {
+            $ekskuls = collect(); // Jika tingkat tidak ditemukan, kembalikan koleksi kosong
+        }
+
+        return new EkskulResource(true, 'Ekskul Found for Siswa', [
+            'siswa' => $siswa->nama,
+            'kelas' => $siswa->kelas,
+            'ekskul' => $ekskuls,
+        ]);
+    }
 }

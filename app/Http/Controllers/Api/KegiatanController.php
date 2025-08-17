@@ -158,4 +158,31 @@ class KegiatanController extends Controller
 
         return new KegiatanResource(true, 'Kegiatan Deleted Successfully', null);
     }
+
+    public function showBySiswaId($siswaId, $tahun = null)
+{
+    // Cari kegiatan berdasarkan siswa_id dari relasi details
+    $kegiatans = Kegiatan::whereHas('details', function ($query) use ($siswaId) {
+        $query->where('siswa_id', $siswaId);
+    })
+    ->when($tahun, function ($query) use ($tahun) {
+        $query->whereYear('tanggal_kegiatan', $tahun); // Filter berdasarkan tahun jika diberikan
+    })
+    ->with([
+        'details' => function ($query) use ($siswaId) {
+            $query->where('siswa_id', $siswaId);
+        }
+    ])
+    ->orderBy('tanggal_kegiatan', 'desc')
+    ->get();
+
+    if ($kegiatans->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No Kegiatan Found for the Given Siswa and Year',
+        ], 404);
+    }
+
+    return new KegiatanResource(true, 'Kegiatan Found for Siswa', $kegiatans);
+}
 }

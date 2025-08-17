@@ -176,4 +176,93 @@ class NilaiController extends Controller
 
         return new NilaiResource(true, 'Nilai Deleted Successfully', null);
     }
+
+    public function showBySiswaId($siswaId, $tahun = null)
+    {
+        // Ambil nilai berdasarkan siswa_id dari relasi details
+        $nilais = Nilai::whereHas('details', function ($query) use ($siswaId) {
+            $query->where('siswa_id', $siswaId);
+        })
+            ->when($tahun, function ($query) use ($tahun) {
+                $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun jika diberikan
+            })
+            ->with([
+                'details' => function ($query) use ($siswaId) {
+                    $query->where('siswa_id', $siswaId);
+                }
+            ])
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        if ($nilais->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No Nilai Found for the Given Siswa and Year',
+            ], 404);
+        }
+
+        return new NilaiResource(true, 'Nilai Found for Siswa', $nilais);
+    }
+
+    public function indexByNilai(Request $request)
+    {
+        // Ambil parameter sorting dan filter dari query string
+        $sortBy = $request->query('sort_by', 'nilai_id'); // Default: nilai_id
+        $sortOrder = $request->query('sort_order', 'desc'); // Default: desc
+        $tahun = $request->query('tahun'); // Filter berdasarkan tahun
+
+        // Validasi parameter sorting
+        $allowedSortBy = ['kelas', 'ekskul', 'nilai_id'];
+        if (!in_array($sortBy, $allowedSortBy)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid sort_by parameter. Allowed values: kelas, ekskul, nilai_id',
+            ], 400);
+        }
+
+        // Ambil data dari tabel nilai_details dengan relasi siswa dan nilai
+        $detailNilais = \App\Models\DetailNilai::with(['siswa', 'nilai.ekskul'])
+            ->when($tahun, function ($query) use ($tahun) {
+                $query->whereHas('nilai', function ($query) use ($tahun) {
+                    $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun
+                });
+            })
+            ->when($sortBy === 'kelas', function ($query) use ($sortOrder) {
+                $query->join('siswas', 'detail_nilais.siswa_id', '=', 'siswas.id')
+                    ->orderBy('siswas.kelas', $sortOrder);
+            })
+            ->when($sortBy === 'ekskul', function ($query) use ($sortOrder) {
+                $query->join('nilais', 'detail_nilais.nilai_id', '=', 'nilais.id')
+                    ->join('ekskuls', 'nilais.ekskul_id', '=', 'ekskuls.id')
+                    ->orderBy('ekskuls.nama', $sortOrder);
+            }, function ($query) use ($sortBy, $sortOrder) {
+                $query->orderBy($sortBy, $sortOrder); // Default sorting
+            })
+            ->get();
+
+        if ($detailNilais->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No Nilai Found',
+            ], 404);
+        }
+
+        // Format data untuk ditampilkan per nilai
+        $result = $detailNilais->map(function ($detail) {
+            return [
+                'nilai_id' => $detail->nilai_id,
+                'tanggal' => $detail->nilai->tanggal,
+                'ekskul_id' => $detail->nilai->ekskul_id,
+                'nama_ekskul' => $detail->nilai->ekskul->nama ?? null,
+                'siswa_id' => $detail->siswa->id,
+                'nama_siswa' => $detail->siswa->nama,
+                'kelas' => $detail->siswa->kelas,
+                'nilai_akhir' => $detail->nilai_akhir,
+                'index_nilai' => $detail->index_nilai,
+                'keterangan' => $detail->keterangan,
+            ];
+        });
+
+        return new NilaiResource(true, 'List of Nilai Details', $result);
+    }
 }

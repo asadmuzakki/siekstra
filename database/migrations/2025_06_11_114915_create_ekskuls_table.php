@@ -19,6 +19,11 @@ return new class extends Migration {
             $table->string('tempat');
             $table->foreignId('tutor_id')->constrained('users', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
+
+            // Kriteria kelas
+            $table->unsignedTinyInteger('kelas_min'); // contoh: kelas 1
+            $table->unsignedTinyInteger('kelas_max'); // contoh: kelas 6
+
             $table->timestamps();
         });
     }

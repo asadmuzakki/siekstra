@@ -17,8 +17,11 @@ use App\Http\Controllers\Api\UserController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
-Route::middleware('auth:sanctum')->put('/edit-profile', [AuthController::class, 'editProfile']);
-Route::middleware('auth:sanctum')->get('/profile', [AuthController::class, 'getProfile']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/profile', [AuthController::class, 'getProfile']);
+    Route::put('/edit-profile', [AuthController::class, 'editProfile']);
+});
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
@@ -39,6 +42,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::delete('/delete-wali-murid/{id}', [UserController::class, 'deleteWaliMurid']);
     Route::apiResource('ekskul', EkskulController::class);
     Route::apiResource('absensi-tutor', AbsensiTutorController::class);
+    Route::get('/nilaiByDetail', [NilaiController::class, 'indexByNilai']);
+    Route::get('/absensiByDetail', [AbsensiController::class, 'indexByAbsensi']);
 });
 Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(function () {
     Route::get('/dashboard', function () {
@@ -58,5 +63,19 @@ Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(functi
     // Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
     Route::apiResource('ekskul', EkskulController::class);
 });
+Route::middleware(['auth:sanctum', 'role:wali_murid'])->prefix('wali_murid')->group(function () {
+    Route::get('/dashboard', function () {
+        return response()->json(['message' => 'Selamat datang siswa!']);
+    });
+    Route::apiResource('pendaftaran', \App\Http\Controllers\Api\PendaftaranController::class);
+    Route::get('/pendaftaranBySiswa/{siswa_id}', [\App\Http\Controllers\Api\PendaftaranController::class, 'showBySiswa']);
+    Route::get('/ekskulForWali', [EkskulController::class, 'ekskulForWali']);
+    Route::get('/ekskulBySiswa/{siswa_id}', [EkskulController::class, 'showBySiswaId']);
+    Route::get('/absensiBySiswa/{siswa_id}/{tahun?}', [AbsensiController::class, 'showBySiswaId']);
+    Route::get('/kegiatanBySiswa/{siswa_id}/{tahun?}', [KegiatanController::class, 'showBySiswaId']);
+    Route::get('/nilaiBySiswa/{siswa_id}/{tahun?}', [NilaiController::class, 'showBySiswaId']);
+});
 
 Route::post('/tes-absensi', [TesController::class, 'store']);
+Route::get('/nilaiByDetail', [NilaiController::class, 'indexByNilai']);
+Route::get('/absensiByDetail', [AbsensiController::class, 'indexByAbsensi']);
