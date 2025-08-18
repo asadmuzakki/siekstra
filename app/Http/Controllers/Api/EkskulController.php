@@ -145,7 +145,7 @@ class EkskulController extends Controller
     public function ekskulForWali()
     {
         $wali = auth()->user();
-        $siswaList = $wali->siswa;
+        $siswaList = $wali->anak;
 
         $result = [];
 
