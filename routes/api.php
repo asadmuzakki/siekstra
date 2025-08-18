@@ -74,6 +74,7 @@ Route::middleware(['auth:sanctum', 'role:wali_murid'])->prefix('wali_murid')->gr
     Route::get('/absensiBySiswa/{siswa_id}/{tahun?}', [AbsensiController::class, 'showBySiswaId']);
     Route::get('/kegiatanBySiswa/{siswa_id}/{tahun?}', [KegiatanController::class, 'showBySiswaId']);
     Route::get('/nilaiBySiswa/{siswa_id}/{tahun?}', [NilaiController::class, 'showBySiswaId']);
+    Route::get('/anak-wali', [SiswaController::class, 'anakWali']);
 });
 
 Route::post('/tes-absensi', [TesController::class, 'store']);

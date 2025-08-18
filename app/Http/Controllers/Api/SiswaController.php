@@ -93,4 +93,17 @@ class SiswaController extends Controller
 
         return new SiswaResource(true, 'Siswa Deleted Successfully', null);
     }
+
+    public function anakWali()
+    {
+        // Ambil user yang sedang login (wali murid)
+        $wali = auth()->user();
+
+        // Ambil data siswa yang memiliki email sesuai user wali
+        $siswas = Siswa::where('email_ortu', $wali->email)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return new SiswaResource(true, 'List of Anak Wali Murid', $siswas);
+    }
 }
