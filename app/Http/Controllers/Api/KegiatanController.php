@@ -172,7 +172,7 @@ class KegiatanController extends Controller
                 'details' => function ($query) use ($siswaId) {
                     $query->where('siswa_id', $siswaId);
                 },
-                'ekskul' // Tambahkan relasi ekskul
+                'ekskul'
             ])
             ->orderBy('tanggal_kegiatan', 'desc')
             ->get();
@@ -184,15 +184,11 @@ class KegiatanController extends Controller
             ], 404);
         }
 
-        // Format agar nama ekskul ikut tertampil
-        $result = $kegiatans->map(function ($kegiatan) {
-            return [
-                'id' => $kegiatan->id,
-                'nama_kegiatan' => $kegiatan->nama_kegiatan,
-                'tanggal_kegiatan' => $kegiatan->tanggal_kegiatan,
-                'nama_ekskul' => $kegiatan->ekskul->nama_ekskul ?? null,
-                'details' => $kegiatan->details,
-            ];
+        // Tambahkan field nama_ekskul pada setiap item
+        $result = $kegiatans->map(function ($item) {
+            $data = $item->toArray();
+            $data['nama_ekskul'] = $item->ekskul->nama_ekskul ?? null;
+            return $data;
         });
 
         return response()->json([
