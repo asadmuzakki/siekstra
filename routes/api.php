@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'getProfile']);
     Route::put('/edit-profile', [AuthController::class, 'editProfile']);
+    Route::patch('/edit-profile', [AuthController::class, 'editProfile']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
