@@ -160,29 +160,45 @@ class KegiatanController extends Controller
     }
 
     public function showBySiswaId($siswaId, $tahun = null)
-{
-    // Cari kegiatan berdasarkan siswa_id dari relasi details
-    $kegiatans = Kegiatan::whereHas('details', function ($query) use ($siswaId) {
-        $query->where('siswa_id', $siswaId);
-    })
-    ->when($tahun, function ($query) use ($tahun) {
-        $query->whereYear('tanggal_kegiatan', $tahun); // Filter berdasarkan tahun jika diberikan
-    })
-    ->with([
-        'details' => function ($query) use ($siswaId) {
+    {
+        // Cari kegiatan berdasarkan siswa_id dari relasi details
+        $kegiatans = Kegiatan::whereHas('details', function ($query) use ($siswaId) {
             $query->where('siswa_id', $siswaId);
+        })
+            ->when($tahun, function ($query) use ($tahun) {
+                $query->whereYear('tanggal_kegiatan', $tahun); // Filter berdasarkan tahun jika diberikan
+            })
+            ->with([
+                'details' => function ($query) use ($siswaId) {
+                    $query->where('siswa_id', $siswaId);
+                },
+                'ekskul' // Tambahkan relasi ekskul
+            ])
+            ->orderBy('tanggal_kegiatan', 'desc')
+            ->get();
+
+        if ($kegiatans->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No Kegiatan Found for the Given Siswa and Year',
+            ], 404);
         }
-    ])
-    ->orderBy('tanggal_kegiatan', 'desc')
-    ->get();
 
-    if ($kegiatans->isEmpty()) {
+        // Format agar nama ekskul ikut tertampil
+        $result = $kegiatans->map(function ($kegiatan) {
+            return [
+                'id' => $kegiatan->id,
+                'nama_kegiatan' => $kegiatan->nama_kegiatan,
+                'tanggal_kegiatan' => $kegiatan->tanggal_kegiatan,
+                'nama_ekskul' => $kegiatan->ekskul->nama_ekskul ?? null,
+                'details' => $kegiatan->details,
+            ];
+        });
+
         return response()->json([
-            'success' => false,
-            'message' => 'No Kegiatan Found for the Given Siswa and Year',
-        ], 404);
+            'success' => true,
+            'message' => 'Kegiatan Found for Siswa',
+            'data' => $result,
+        ]);
     }
-
-    return new KegiatanResource(true, 'Kegiatan Found for Siswa', $kegiatans);
-}
 }
