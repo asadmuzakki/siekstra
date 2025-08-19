@@ -172,8 +172,8 @@ class KegiatanController extends Controller
                 'details' => function ($query) use ($siswaId) {
                     $query->where('siswa_id', $siswaId);
                 },
-                'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
-                'ekskul'
+                // 'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
+                // 'ekskul'
             ])
             ->orderBy('tanggal_kegiatan', 'desc')
             ->get();
