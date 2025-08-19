@@ -187,6 +187,9 @@ class NilaiController extends Controller
                 $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun jika diberikan
             })
             ->with([
+                'details' => function ($query) use ($siswaId) {
+                    $query->where('siswa_id', $siswaId); // Filter hanya untuk siswa dengan ID spesifik
+                },
                 'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
                 'ekskul',        // Tambahkan relasi ekskul untuk mendapatkan nama_ekskul
             ])
