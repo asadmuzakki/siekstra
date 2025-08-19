@@ -173,7 +173,8 @@ class AbsensiController extends Controller
             ->with([
                 'details' => function ($query) use ($siswaId) {
                     $query->where('siswa_id', $siswaId);
-                }
+                },
+                'ekskul', // Tambahkan relasi ekskul
             ])
             ->orderBy('tanggal', 'desc')
             ->get();
@@ -185,7 +186,25 @@ class AbsensiController extends Controller
             ], 404);
         }
 
-        return new AbsensiResource(true, 'Absensi Found for Siswa', $absensis);
+        // Tambahkan field nama_siswa dan nama_ekskul pada setiap item
+        $result = $absensis->map(function ($absensi) {
+            return [
+                'id' => $absensi->id,
+                'tanggal' => $absensi->tanggal,
+                'agenda' => $absensi->agenda,
+                'nama_ekskul' => $absensi->ekskul->nama_ekskul ?? null, // Tambahkan nama ekskul
+                'details' => $absensi->details->map(function ($detail) {
+                    return [
+                        'siswa_id' => $detail->siswa_id,
+                        'nama_siswa' => $detail->siswa->nama ?? null, // Tambahkan nama siswa
+                        'status' => $detail->status,
+                        'keterangan' => $detail->keterangan,
+                    ];
+                }),
+            ];
+        });
+
+        return new AbsensiResource(true, 'Absensi Found for Siswa', $result);
     }
 
     public function indexByAbsensi(Request $request)
