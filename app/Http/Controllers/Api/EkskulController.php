@@ -157,6 +157,7 @@ class EkskulController extends Controller
             if ($tingkat) {
                 $ekskuls = Ekskul::where('kelas_min', '<=', $tingkat)
                     ->where('kelas_max', '>=', $tingkat)
+                    ->where('status', 'aktif') // Hanya ambil ekskul yang aktif
                     ->get();
             } else {
                 $ekskuls = collect();
