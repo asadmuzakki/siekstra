@@ -172,6 +172,7 @@ class KegiatanController extends Controller
                 'details' => function ($query) use ($siswaId) {
                     $query->where('siswa_id', $siswaId);
                 },
+                'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
                 'ekskul'
             ])
             ->orderBy('tanggal_kegiatan', 'desc')
@@ -188,6 +189,7 @@ class KegiatanController extends Controller
         $result = $kegiatans->map(function ($item) {
             $data = $item->toArray();
             $data['nama_ekskul'] = $item->ekskul->nama_ekskul ?? null;
+            $data['nama_siswa'] = $item->details->first()->siswa->nama ?? null;
             return $data;
         });
 
