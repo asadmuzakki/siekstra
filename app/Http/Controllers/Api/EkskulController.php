@@ -155,18 +155,34 @@ class EkskulController extends Controller
             $tingkat = $matches[0] ?? null;
 
             if ($tingkat) {
+                // Cari ekskul berdasarkan tingkat kelas siswa
                 $ekskuls = Ekskul::where('kelas_min', '<=', $tingkat)
                     ->where('kelas_max', '>=', $tingkat)
                     ->where('status', 'aktif') // Hanya ambil ekskul yang aktif
-                    ->get();
+                    ->get()
+                    ->map(function ($ekskul) use ($siswa) {
+                        // Periksa apakah siswa sudah terdaftar di ekskul ini
+                        $isRegistered = $ekskul->pendaftarans()->where('siswa_id', $siswa->id)->exists();
+
+                        return [
+                            'id' => $ekskul->id,
+                            'nama_ekskul' => $ekskul->nama_ekskul,
+                            'deskripsi' => $ekskul->deskripsi,
+                            'jadwal' => $ekskul->jadwal,
+                            'tempat' => $ekskul->tempat,
+                            'status' => $ekskul->status,
+                            'foto_url' => $ekskul->foto_url,
+                            'is_registered' => $isRegistered, // Tambahkan status terdaftar
+                        ];
+                    });
             } else {
-                $ekskuls = collect();
+                $ekskuls = collect(); // Jika tingkat tidak ditemukan, kembalikan koleksi kosong
             }
 
             $result[] = [
                 'siswa' => $siswa->nama,
                 'kelas' => $siswa->kelas,
-                'ekskul' => $ekskuls
+                'ekskul' => $ekskuls,
             ];
         }
 
