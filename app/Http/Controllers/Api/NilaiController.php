@@ -187,9 +187,8 @@ class NilaiController extends Controller
                 $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun jika diberikan
             })
             ->with([
-                'details' => function ($query) use ($siswaId) {
-                    $query->where('siswa_id', $siswaId);
-                }
+                'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
+                'ekskul',        // Tambahkan relasi ekskul untuk mendapatkan nama_ekskul
             ])
             ->orderBy('tanggal', 'desc')
             ->get();
@@ -201,7 +200,29 @@ class NilaiController extends Controller
             ], 404);
         }
 
-        return new NilaiResource(true, 'Nilai Found for Siswa', $nilais);
+        // Tambahkan field nama_ekskul dan kelas siswa pada setiap item
+        $result = $nilais->map(function ($nilai) {
+            return [
+                'id' => $nilai->id,
+                'tanggal' => $nilai->tanggal,
+                'nama_ekskul' => $nilai->ekskul->nama_ekskul ?? null, // Ambil nama ekskul
+                'details' => $nilai->details->map(function ($detail) {
+                    return [
+                        'siswa_id' => $detail->siswa_id,
+                        'nama_siswa' => $detail->siswa->nama ?? null, // Ambil nama siswa
+                        'kelas' => $detail->siswa->kelas ?? null,     // Ambil kelas siswa
+                        'kehadiran' => $detail->kehadiran,
+                        'keaktifan' => $detail->keaktifan,
+                        'praktik' => $detail->praktik,
+                        'nilai_akhir' => $detail->nilai_akhir,
+                        'index_nilai' => $detail->index_nilai,
+                        'keterangan' => $detail->keterangan,
+                    ];
+                }),
+            ];
+        });
+
+        return new NilaiResource(true, 'Nilai Found for Siswa', $result);
     }
 
     public function indexByNilai(Request $request)
