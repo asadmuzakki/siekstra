@@ -100,7 +100,8 @@ class SiswaController extends Controller
         $wali = auth()->user();
 
         // Ambil data siswa yang memiliki email sesuai user wali
-        $siswas = Siswa::where('email_ortu', $wali->email)
+        $siswas = Siswa::with('pendaftarans.ekskul')
+            ->where('email_ortu', $wali->email)
             ->orderBy('created_at', 'desc')
             ->get();
 
