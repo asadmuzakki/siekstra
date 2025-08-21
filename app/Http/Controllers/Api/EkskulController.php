@@ -97,6 +97,8 @@ class EkskulController extends Controller
             'tutor_id' => 'required|exists:users,id',
             'status' => 'required|in:aktif,nonaktif',
             'foto' => 'nullable|image|max:2048',
+            'kelas_min' => 'required|integer|min:1|max:6',
+            'kelas_max' => 'required|integer|min:1|max:6|gte:kelas_min',
         ]);
 
         // Default foto lama
@@ -122,6 +124,8 @@ class EkskulController extends Controller
             'tutor_id' => $validated['tutor_id'],
             'status' => $validated['status'],
             'foto_url' => $fotoUrl,
+            'kelas_min' => $validated['kelas_min'],
+            'kelas_max' => $validated['kelas_max'],
         ]);
 
         return new EkskulResource(true, 'Ekskul Updated Successfully', $ekskul);
