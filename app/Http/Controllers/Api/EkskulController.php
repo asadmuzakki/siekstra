@@ -34,6 +34,8 @@ class EkskulController extends Controller
             'tutor_id' => 'required|exists:users,id',
             'status' => 'required|in:aktif,nonaktif', // Assuming status can be Aktif or Nonaktif
             'foto' => 'nullable|image|max:2048', // Optional image upload
+            'kelas_min' => 'required|integer|min:1|max:6',
+            'kelas_max' => 'required|integer|min:1|max:6|gte:kelas_min',
         ]);
         $fotoUrl = CloudinaryService::uploadImage($request->file('foto'));
         $ekskul = Ekskul::create([
@@ -44,6 +46,8 @@ class EkskulController extends Controller
             'tutor_id' => $validated['tutor_id'],
             'status' => $validated['status'],
             'foto_url' => $fotoUrl['secure_url'] ?? null, // Store the secure URL from Cloudinary
+            'kelas_min' => $validated['kelas_min'],
+            'kelas_max' => $validated['kelas_max'],
         ]);
 
         return new EkskulResource(true, 'Ekskul Created Successfully', $ekskul);
