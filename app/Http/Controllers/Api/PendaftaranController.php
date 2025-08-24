@@ -54,7 +54,7 @@ class PendaftaranController extends Controller
      */
     public function show($id)
     {
-        $pendaftaran = Pendaftaran::find($id);
+        $pendaftaran = Pendaftaran::with('ekskul', 'siswa')->find($id);
 
         if (!$pendaftaran) {
             return new PendaftaranResource(false, 'Pendaftaran Not Found', null);
