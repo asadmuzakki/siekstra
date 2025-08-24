@@ -10,6 +10,7 @@ class Pendaftaran extends Model
         'siswa_id',
         'ekskul_id',
         'tanggal_pendaftaran',
+        'jumlah_pindah',
     ];
 
     public function siswa()

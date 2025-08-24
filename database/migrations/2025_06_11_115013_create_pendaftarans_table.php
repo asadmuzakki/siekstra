@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->foreignId('siswa_id')->constrained('siswas', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('ekskul_id')->constrained('ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->date('tanggal_pendaftaran');
+            $table->integer('jumlah_pindah')->default(0);
             $table->timestamps();
         });
     }

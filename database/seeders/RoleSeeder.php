@@ -24,12 +24,29 @@ class RoleSeeder extends Seeder
         ]);
         $user1->assignRole($admin);
 
-        $user2 = User::create([
-            'name' => 'Guru',
-            'email' => 'guru@example.com',
-            'password' => Hash::make('password')
-        ]);
-        $user2->assignRole($tutor);
+        // Buat beberapa user guru
+        $gurus = [
+            [
+                'name' => 'Guru 1',
+                'email' => 'guru1@example.com',
+                'password' => Hash::make('password')
+            ],
+            [
+                'name' => 'Guru 2',
+                'email' => 'guru2@example.com',
+                'password' => Hash::make('password')
+            ],
+            [
+                'name' => 'Guru 3',
+                'email' => 'guru3@example.com',
+                'password' => Hash::make('password')
+            ]
+        ];
+
+        foreach ($gurus as $guru) {
+            $user = User::create($guru);
+            $user->assignRole($tutor);
+        }
     }
 }
 

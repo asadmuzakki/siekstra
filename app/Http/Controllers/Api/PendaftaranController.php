@@ -15,7 +15,9 @@ class PendaftaranController extends Controller
      */
     public function index()
     {
-        $pendaftarans = Pendaftaran::all();
+        $pendaftarans = Pendaftaran::with('siswa', 'ekskul')
+            ->orderBy('created_at', 'desc')
+            ->get();
         return new PendaftaranResource(true, 'List of Pendaftaran', $pendaftarans);
     }
     /**
@@ -81,6 +83,7 @@ class PendaftaranController extends Controller
             'siswa_id' => $validated['siswa_id'],
             'ekskul_id' => $validated['ekskul_id'],
             'tanggal_pendaftaran' => Carbon::today(),
+            'jumlah_pindah' => $pendaftaran->jumlah_pindah + 1,
         ]);
 
         return new PendaftaranResource(true, 'Pendaftaran Updated Successfully', $pendaftaran);

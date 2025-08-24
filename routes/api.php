@@ -45,6 +45,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::apiResource('absensi-tutor', AbsensiTutorController::class);
     Route::get('/nilaiByDetail', [NilaiController::class, 'indexByNilai']);
     Route::get('/absensiByDetail', [AbsensiController::class, 'indexByAbsensi']);
+    Route::apiResource('pendaftaran', \App\Http\Controllers\Api\PendaftaranController::class);
 });
 Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(function () {
     Route::get('/dashboard', function () {
