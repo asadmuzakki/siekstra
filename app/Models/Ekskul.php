@@ -26,4 +26,8 @@ class Ekskul extends Model
     {
         return $this->hasMany(Pendaftaran::class);
     }
+    public function kegiatans()
+    {
+        return $this->hasMany(Kegiatan::class);
+    }
 }

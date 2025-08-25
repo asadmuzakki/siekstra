@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\KegiatanController;
 use App\Http\Controllers\Api\AbsensiTutorController;
 use App\Http\Controllers\Api\NilaiController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\DashboardController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -25,9 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function () {
-        return response()->json(['message' => 'Selamat datang admin!']);
-    });
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard/grafik-pendaftaran', [DashboardController::class, 'grafikPendaftaran']);
+    Route::get('/dashboard/grafik-kegiatan', [DashboardController::class, 'grafikKegiatan']);
     Route::apiResource('siswas', SiswaController::class);
     Route::post('/add-tutor', [UserController::class, 'addTutor']);
     Route::delete('/delete-tutor/{id}', [UserController::class, 'deleteTutor']);
