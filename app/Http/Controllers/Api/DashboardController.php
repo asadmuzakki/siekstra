@@ -24,7 +24,13 @@ class DashboardController extends Controller
         $endOfWeek = Carbon::now()->endOfWeek();
         $totalAbsensi = Absensi::whereBetween('tanggal', [$startOfWeek, $endOfWeek])->count();
         $totalHadir = Absensi::whereBetween('tanggal', [$startOfWeek, $endOfWeek])
-            ->where('status', 'hadir')->count();
+            ->withCount([
+                'details as total_hadir' => function ($q) {
+                    $q->where('status', 'hadir');
+                }
+            ])
+            ->get()
+            ->sum('total_hadir');
         $persenHadir = $totalAbsensi > 0 ? round(($totalHadir / $totalAbsensi) * 100, 2) : 0;
 
         return response()->json([
