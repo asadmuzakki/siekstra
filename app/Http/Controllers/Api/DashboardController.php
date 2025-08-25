@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         // === COUNTER ATAS ===
         $totalSiswa = Siswa::count();
-        $totalTutor = User::where('role', 'tutor')->count();
+        $totalTutor = User::role('tutor')->count();
         $totalEkskul = Ekskul::where('status', 'aktif')->count();
 
         // Kehadiran minggu ini
