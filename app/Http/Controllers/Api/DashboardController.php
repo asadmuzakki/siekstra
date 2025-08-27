@@ -70,24 +70,22 @@ class DashboardController extends Controller
     public function grafikKegiatan(Request $request)
     {
         $tingkat = $request->query('tingkat');   // contoh: "5"
-        $kategori = $request->query('kategori'); // contoh: "Olahraga"
-        $tahun = $request->query('tahun');    // contoh: 2025
+        $kategori = $request->query('kategori');  // contoh: "Olahraga"
+        $tahun = $request->query('tahun');     // contoh: 2025
 
         $query = Ekskul::with([
-            'kegiatans' => function ($q) use ($tahun) {
+            'kegiatans' => function ($q) use ($tingkat, $kategori, $tahun) {
                 if ($tahun) {
                     $q->whereYear('tanggal', $tahun);
                 }
+                if ($tingkat) {
+                    $q->where('tingkat', $tingkat);
+                }
+                if ($kategori) {
+                    $q->where('kategori', $kategori);
+                }
             }
         ]);
-
-        if ($tingkat) {
-            $query->where('tingkat', $tingkat);
-        }
-
-        if ($kategori) {
-            $query->where('kategori', $kategori);
-        }
 
         $data = $query->get()->map(function ($e) {
             return [
@@ -102,4 +100,5 @@ class DashboardController extends Controller
             'data' => $data,
         ]);
     }
+
 }
