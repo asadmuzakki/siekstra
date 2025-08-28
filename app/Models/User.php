@@ -51,4 +51,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Siswa::class, 'email_ortu', 'email');
     }
+    public function ekskuls()
+    {
+        return $this->hasMany(\App\Models\Ekskul::class, 'tutor_id');
+    }
 }
