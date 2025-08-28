@@ -74,7 +74,7 @@ class UserController extends Controller
     // Method untuk mendapatkan daftar tutor
     public function getTutors()
     {
-        $tutors = User::role('tutor')->with('ekskuls')->get();
+        $tutors = User::role('tutor')->with('ekskuls:id,nama_ekskul,tutor_id')->get();
         return response()->json([
             'success' => true,
             'message' => 'List of Tutors',
