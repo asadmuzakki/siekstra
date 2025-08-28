@@ -76,7 +76,7 @@ class DashboardController extends Controller
         $query = Ekskul::with([
             'kegiatans' => function ($q) use ($tingkat, $kategori, $tahun) {
                 if ($tahun) {
-                    $q->whereYear('tanggal', $tahun);
+                    $q->whereYear('tanggal_kegiatan', $tahun);
                 }
                 if ($tingkat) {
                     $q->where('tingkat', $tingkat);
