@@ -12,11 +12,17 @@ class AbsensiTutorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $absensiTutors = AbsensiTutor::with(['tutor', 'ekskul']) // Eager load related models
-            ->orderBy('created_at', 'desc') // Sort by date descending
+        $tahun = $request->query('tahun'); // Ambil tahun dari query string
+
+        $absensiTutors = AbsensiTutor::with(['tutor', 'ekskul'])
+            ->when($tahun, function ($query) use ($tahun) {
+                $query->whereYear('tanggal', $tahun);
+            })
+            ->orderBy('created_at', 'desc')
             ->get();
+
         return new AbsensiTutorResource(true, 'List of Absensi Tutor', $absensiTutors);
     }
 
@@ -47,7 +53,7 @@ class AbsensiTutorController extends Controller
 
         if (!$absensiTutor) {
             return new AbsensiTutorResource(false, 'Absensi Tutor Not Found', null);
-        } 
+        }
         $absensiTutor->load('tutor', 'ekskul'); // Eager load related models
 
         return new AbsensiTutorResource(true, 'Absensi Tutor Found', $absensiTutor);
