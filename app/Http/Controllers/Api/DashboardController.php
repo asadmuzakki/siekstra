@@ -51,7 +51,7 @@ class DashboardController extends Controller
 
         $data = Ekskul::with([
             'pendaftarans' => function ($q) use ($tahun) {
-                $q->whereYear('created_at', $tahun);
+                $q->whereYear('tanggal_pendaftaran', $tahun);
             }
         ])->get()->map(function ($e) {
             return [
