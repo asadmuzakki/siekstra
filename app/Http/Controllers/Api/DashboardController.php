@@ -32,8 +32,7 @@ class DashboardController extends Controller
             ->get()
             ->sum('total_hadir');
         $persenHadir = $totalAbsensi > 0 ? round(($totalHadir / $totalAbsensi) * 100, 2) : 0;
-        dd($startOfWeek->toDateString(), $endOfWeek->toDateString());
-
+        
         return response()->json([
             'success' => true,
             'message' => 'Dashboard Data',
