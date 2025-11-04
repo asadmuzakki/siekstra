@@ -38,6 +38,7 @@ class DashboardController extends Controller
             ? round(($totalHadir / $totalAbsensi) * 100, 2)
             : 0;
 
+            
         return response()->json([
             'success' => true,
             'message' => 'Dashboard Data',
