@@ -31,13 +31,13 @@ class DashboardController extends Controller
         // Total hadir minggu ini
         $totalHadir = DetailAbsensi::whereHas('absensi', function ($q) use ($startOfWeek, $endOfWeek) {
             $q->whereBetween('tanggal', [$startOfWeek, $endOfWeek]);
-        })->where('status', 'hadir')->count();
+        })->where('status', 'Hadir')->count();
 
         // Hitung persentase kehadiran
         $persenHadir = $totalAbsensi > 0
             ? round(($totalHadir / $totalAbsensi) * 100, 2)
             : 0;
-            
+
         return response()->json([
             'success' => true,
             'message' => 'Dashboard Data',
