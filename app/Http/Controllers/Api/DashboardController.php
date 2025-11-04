@@ -23,7 +23,7 @@ class DashboardController extends Controller
         // Kehadiran minggu ini
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek = Carbon::now()->endOfWeek();
-        // Total baris absensi detail minggu ini (semua siswa, semua ekskul)
+        // Total baris absensi minggu ini (semua siswa, semua ekskul)
         $totalAbsensi = DetailAbsensi::whereHas('absensi', function ($q) use ($startOfWeek, $endOfWeek) {
             $q->whereBetween('tanggal', [$startOfWeek, $endOfWeek]);
         })->count();
@@ -31,13 +31,13 @@ class DashboardController extends Controller
         // Total hadir minggu ini
         $totalHadir = DetailAbsensi::whereHas('absensi', function ($q) use ($startOfWeek, $endOfWeek) {
             $q->whereBetween('tanggal', [$startOfWeek, $endOfWeek]);
-        })->whereRaw('LOWER(status) = ?', ['hadir'])->count();
+        })->where('status', 'hadir')->count();
 
-        // Hitung persen kehadiran
+        // Hitung persentase kehadiran
         $persenHadir = $totalAbsensi > 0
             ? round(($totalHadir / $totalAbsensi) * 100, 2)
             : 0;
-
+            
         return response()->json([
             'success' => true,
             'message' => 'Dashboard Data',
