@@ -7,6 +7,7 @@ use App\Models\Siswa;
 use App\Models\User;
 use App\Models\Ekskul;
 use App\Models\Absensi;
+use App\Models\DetailAbsensi;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -22,17 +23,21 @@ class DashboardController extends Controller
         // Kehadiran minggu ini
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek = Carbon::now()->endOfWeek();
-        $totalAbsensi = Absensi::whereBetween('tanggal', [$startOfWeek, $endOfWeek])->count();
-        $totalHadir = Absensi::whereBetween('tanggal', [$startOfWeek, $endOfWeek])
-            ->withCount([
-                'details as total_hadir' => function ($q) {
-                    $q->where('status', 'Hadir');
-                }
-            ])
-            ->get()
-            ->sum('total_hadir');
-        $persenHadir = $totalAbsensi > 0 ? round(($totalHadir / $totalAbsensi) * 100, 2) : 0;
-        
+        // Total baris absensi detail minggu ini (semua siswa, semua ekskul)
+        $totalAbsensi = DetailAbsensi::whereHas('absensi', function ($q) use ($startOfWeek, $endOfWeek) {
+            $q->whereBetween('tanggal', [$startOfWeek, $endOfWeek]);
+        })->count();
+
+        // Total hadir minggu ini
+        $totalHadir = DetailAbsensi::whereHas('absensi', function ($q) use ($startOfWeek, $endOfWeek) {
+            $q->whereBetween('tanggal', [$startOfWeek, $endOfWeek]);
+        })->whereRaw('LOWER(status) = ?', ['hadir'])->count();
+
+        // Hitung persen kehadiran
+        $persenHadir = $totalAbsensi > 0
+            ? round(($totalHadir / $totalAbsensi) * 100, 2)
+            : 0;
+
         return response()->json([
             'success' => true,
             'message' => 'Dashboard Data',
