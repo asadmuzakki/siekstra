@@ -26,7 +26,7 @@ class DashboardController extends Controller
         $totalHadir = Absensi::whereBetween('tanggal', [$startOfWeek, $endOfWeek])
             ->withCount([
                 'details as total_hadir' => function ($q) {
-                    $q->where('status', 'hadir');
+                    $q->where('status', 'Hadir');
                 }
             ])
             ->get()
