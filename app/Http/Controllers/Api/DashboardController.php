@@ -20,8 +20,8 @@ class DashboardController extends Controller
         $totalEkskul = Ekskul::where('status', 'aktif')->count();
 
         // Kehadiran minggu ini
-        $startOfWeek = Carbon::now()->startOfWeek();
-        $endOfWeek = Carbon::now()->endOfWeek();
+        $startOfWeek = Carbon::now()->startOfWeek(Carbon::SUNDAY);
+        $endOfWeek = Carbon::now()->endOfWeek(Carbon::SATURDAY);
         $totalAbsensi = Absensi::whereBetween('tanggal', [$startOfWeek, $endOfWeek])->count();
         $totalHadir = Absensi::whereBetween('tanggal', [$startOfWeek, $endOfWeek])
             ->withCount([
@@ -32,7 +32,6 @@ class DashboardController extends Controller
             ->get()
             ->sum('total_hadir');
         $persenHadir = $totalAbsensi > 0 ? round(($totalHadir / $totalAbsensi) * 100, 2) : 0;
-        dd($startOfWeek->toDateString(), $endOfWeek->toDateString());
 
         return response()->json([
             'success' => true,
