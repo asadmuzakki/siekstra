@@ -13,6 +13,41 @@ class Pendaftaran extends Model
         'jumlah_pindah',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Event saat data pendaftaran dibuat
+        static::created(function ($pendaftaran) {
+            $kelas = $pendaftaran->kelas_ekskul()->with('nilai')->first();
+
+            if (!$kelas || $kelas->status === 'Nonaktif')
+                return;
+
+            $nilai = $kelas->nilai->first();
+            if (!$nilai)
+                return;
+
+            // Cegah duplikasi
+            $cek = DetailNilai::where('nilai_id', $nilai->id)
+                ->where('siswa_id', $pendaftaran->siswa_id)
+                ->first();
+
+            if (!$cek) {
+                DetailNilai::create([
+                    'nilai_id' => $nilai->id,
+                    'siswa_id' => $pendaftaran->siswa_id,
+                    'kehadiran' => null,
+                    'keaktifan' => null,
+                    'praktik' => null,
+                    'nilai_akhir' => null,
+                    'index_nilai' => null,
+                    'keterangan' => null,
+                ]);
+            }
+        });
+    }
+
     public function siswa()
     {
         return $this->belongsTo(Siswa::class);
