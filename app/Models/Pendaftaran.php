@@ -8,7 +8,7 @@ class Pendaftaran extends Model
 {
     protected $fillable = [
         'siswa_id',
-        'ekskul_id',
+        'kelas_ekskul_id',
         'tanggal_pendaftaran',
         'jumlah_pindah',
     ];
@@ -18,8 +18,12 @@ class Pendaftaran extends Model
         return $this->belongsTo(Siswa::class);
     }
 
-    public function ekskul()
+    // public function ekskul()
+    // {
+    //     return $this->belongsTo(Ekskul::class);
+    // }
+    public function kelas_ekskul()
     {
-        return $this->belongsTo(Ekskul::class);
+        return $this->belongsTo(Kelas_Ekskul::class);
     }
 }

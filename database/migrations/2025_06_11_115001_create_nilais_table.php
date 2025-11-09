@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('nilais', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ekskul_id')->constrained('ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('kelas_ekskul_id')->constrained('kelas_ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->date('tanggal');
             $table->timestamps();
         });

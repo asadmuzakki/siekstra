@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ekskul_id')->constrained('ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('kelas_ekskul_id')->constrained('kelas_ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->string('nama_kegiatan');
             $table->enum('kategori', ['lomba', 'non-lomba', 'lainnya']);
             $table->enum('tingkat', ['sekolah', 'kota', 'provinsi', 'nasional']);

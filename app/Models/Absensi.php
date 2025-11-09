@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Absensi extends Model
 {
    protected $fillable = [
-      'ekskul_id',
+      'kelas_ekskul_id',
       'agenda',
       'tanggal'
    ];
@@ -17,8 +17,12 @@ class Absensi extends Model
       return $this->hasMany(DetailAbsensi::class);
    }
 
-   public function ekskul()
+   // public function ekskul()
+   // {
+   //    return $this->belongsTo(Ekskul::class);
+   // }
+   public function kelas_ekskul()
    {
-      return $this->belongsTo(Ekskul::class);
+      return $this->belongsTo(Kelas_Ekskul::class);
    }
 }

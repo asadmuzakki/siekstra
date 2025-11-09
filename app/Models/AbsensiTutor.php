@@ -8,7 +8,7 @@ class AbsensiTutor extends Model
 {
     protected $fillable = [
         'tutor_id',
-        'ekskul_id',
+        'kelas_ekskul_id',
         'tanggal',
         'keterangan',
         'status'
@@ -18,8 +18,12 @@ class AbsensiTutor extends Model
     {
         return $this->belongsTo(User::class, 'tutor_id');
     }
-    public function ekskul()
+    // public function ekskul()
+    // {
+    //     return $this->belongsTo(Ekskul::class);
+    // }
+    public function kelas_ekskul()
     {
-        return $this->belongsTo(Ekskul::class);
+        return $this->belongsTo(Kelas_Ekskul::class);
     }
 }

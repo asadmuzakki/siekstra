@@ -16,7 +16,7 @@ class AbsensiTutorController extends Controller
     {
         $tahun = $request->query('tahun'); // Ambil tahun dari query string
 
-        $absensiTutors = AbsensiTutor::with(['tutor', 'ekskul'])
+        $absensiTutors = AbsensiTutor::with(['tutor', 'kelas_ekskul.ekskul'])
             ->when($tahun, function ($query) use ($tahun) {
                 $query->whereYear('tanggal', $tahun);
             })
@@ -33,7 +33,7 @@ class AbsensiTutorController extends Controller
     {
         $validated = $request->validate([
             'tutor_id' => 'required|exists:users,id',
-            'ekskul_id' => 'required|exists:ekskuls,id',
+            'kelas_ekskul_id' => 'required|exists:kelas_ekskuls,id',
             'tanggal' => 'required|date',
             'status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
             'keterangan' => 'nullable|string',
@@ -54,7 +54,7 @@ class AbsensiTutorController extends Controller
         if (!$absensiTutor) {
             return new AbsensiTutorResource(false, 'Absensi Tutor Not Found', null);
         }
-        $absensiTutor->load('tutor', 'ekskul'); // Eager load related models
+        $absensiTutor->load('tutor', 'kelas_ekskul.ekskul'); // Eager load related models
 
         return new AbsensiTutorResource(true, 'Absensi Tutor Found', $absensiTutor);
     }
@@ -72,7 +72,7 @@ class AbsensiTutorController extends Controller
 
         $validated = $request->validate([
             'tutor_id' => 'required|exists:users,id',
-            'ekskul_id' => 'required|exists:ekskuls,id',
+            'kelas_ekskul_id' => 'required|exists:kelas_ekskuls,id',
             'tanggal' => 'required|date',
             'status' => 'required|string|in:Hadir,Alpha,Izin,Sakit',
             'keterangan' => 'nullable|string',
@@ -80,7 +80,7 @@ class AbsensiTutorController extends Controller
 
         $absensiTutor->update([
             'tutor_id' => $validated['tutor_id'],
-            'ekskul_id' => $validated['ekskul_id'],
+            'kelas_ekskul_id' => $validated['kelas_ekskul_id'],
             'tanggal' => $validated['tanggal'],
             'status' => $validated['status'],
             'keterangan' => $validated['keterangan'] ?? null,

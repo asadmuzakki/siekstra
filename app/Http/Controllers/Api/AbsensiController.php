@@ -24,8 +24,10 @@ class AbsensiController extends Controller
      */
     public function rekap($ekskul_id)
     {
-        $absensis = Absensi::with('details')
-            ->where('ekskul_id', $ekskul_id)
+        $absensis = Absensi::with('details', 'kelas_ekskul.ekskul')
+            ->whereHas('kelasEkskul', function ($query) use ($ekskul_id) {
+                $query->where('ekskul_id', $ekskul_id); // Filter berdasarkan ekskul_id
+            })
             ->get();
 
         $rekap = $absensis->map(function ($absensi) {
@@ -60,7 +62,7 @@ class AbsensiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ekskul_id' => 'required|exists:ekskuls,id',
+            'kelas_ekskul_id' => 'required|exists:kelas_ekskuls,id',
             'tanggal' => 'required|date',
             'agenda' => 'nullable|string',
             'absensis' => 'required|array',
@@ -70,7 +72,7 @@ class AbsensiController extends Controller
         ]);
 
         $absensi = Absensi::create([
-            'ekskul_id' => $validated['ekskul_id'],
+            'kelas_ekskul_id' => $validated['kelas_ekskul_id'],
             'tanggal' => $validated['tanggal'],
             'agenda' => $validated['agenda'] ?? null,
         ]);
@@ -111,7 +113,7 @@ class AbsensiController extends Controller
         }
 
         $validated = $request->validate([
-            'ekskul_id' => 'required|exists:ekskuls,id',
+            'kelas_ekskul_id' => 'required|exists:kelas_ekskuls,id',
             'tanggal' => 'required|date',
             'agenda' => 'nullable|string',
             'absensis' => 'required|array',
@@ -122,7 +124,7 @@ class AbsensiController extends Controller
 
         // Update data absensi utama
         $absensi->update([
-            'ekskul_id' => $validated['ekskul_id'],
+            'kelas_ekskul_id' => $validated['kelas_ekskul_id'],
             'tanggal' => $validated['tanggal'],
             'agenda' => $validated['agenda'] ?? null,
         ]);
@@ -174,7 +176,7 @@ class AbsensiController extends Controller
                 'details' => function ($query) use ($siswaId) {
                     $query->where('siswa_id', $siswaId);
                 },
-                'ekskul', // Tambahkan relasi ekskul
+                'kelas_ekskul', // Tambahkan relasi kelas_ekskul
             ])
             ->orderBy('tanggal', 'desc')
             ->get();
@@ -192,7 +194,7 @@ class AbsensiController extends Controller
                 'id' => $absensi->id,
                 'tanggal' => $absensi->tanggal,
                 'agenda' => $absensi->agenda,
-                'nama_ekskul' => $absensi->ekskul->nama_ekskul ?? null, // Tambahkan nama ekskul
+                'nama_ekskul' => $absensi->kelas_ekskul->ekskul->nama_ekskul ?? null, // Tambahkan nama kelas ekskul
                 'details' => $absensi->details->map(function ($detail) {
                     return [
                         'siswa_id' => $detail->siswa_id,
@@ -224,7 +226,7 @@ class AbsensiController extends Controller
         }
 
         // Ambil data dari tabel absensi_details dengan relasi siswa dan absensi
-        $detailAbsensis = \App\Models\DetailAbsensi::with(['siswa', 'absensi.ekskul'])
+        $detailAbsensis = \App\Models\DetailAbsensi::with(['siswa', 'absensi.kelas_ekskul.ekskul'])
             ->when($tahun, function ($query) use ($tahun) {
                 $query->whereHas('absensi', function ($query) use ($tahun) {
                     $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun
@@ -236,7 +238,8 @@ class AbsensiController extends Controller
             })
             ->when($sortBy === 'ekskul', function ($query) use ($sortOrder) {
                 $query->join('absensis', 'detail_absensis.absensi_id', '=', 'absensis.id')
-                    ->join('ekskuls', 'absensis.ekskul_id', '=', 'ekskuls.id')
+                    ->join('kelas_ekskuls', 'absensis.kelas_ekskul_id', '=', 'kelas_ekskuls.id')
+                    ->join('ekskuls', 'kelas_ekskuls.ekskul_id', '=', 'ekskuls.id')
                     ->orderBy('ekskuls.nama_ekskul', $sortOrder);
             }, function ($query) use ($sortBy, $sortOrder) {
                 $query->orderBy($sortBy, $sortOrder); // Default sorting
@@ -255,8 +258,8 @@ class AbsensiController extends Controller
             return [
                 'absensi_id' => $detail->absensi_id,
                 'tanggal' => $detail->absensi->tanggal,
-                'ekskul_id' => $detail->absensi->ekskul_id,
-                'nama_ekskul' => $detail->absensi->ekskul->nama_ekskul ?? null,
+                'ekskul_id' => $detail->absensi->kelas_ekskul->ekskul->ekskul_id,
+                'nama_ekskul' => $detail->absensi->kelas_ekskul->ekskul->nama_ekskul ?? null,
                 'siswa_id' => $detail->siswa->id,
                 'nama_siswa' => $detail->siswa->nama,
                 'kelas' => $detail->siswa->kelas,

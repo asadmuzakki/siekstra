@@ -22,12 +22,16 @@ class Ekskul extends Model
     {
         return $this->belongsTo(User::class, 'tutor_id');
     }
-    public function pendaftarans()
+    // public function pendaftarans()
+    // {
+    //     return $this->hasMany(Pendaftaran::class);
+    // }
+    // public function kegiatans()
+    // {
+    //     return $this->hasMany(Kegiatan::class);
+    // }
+    public function kelas_ekskuls()
     {
-        return $this->hasMany(Pendaftaran::class);
-    }
-    public function kegiatans()
-    {
-        return $this->hasMany(Kegiatan::class);
+        return $this->hasMany(Kelas_Ekskul::class);
     }
 }

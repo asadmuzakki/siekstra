@@ -14,7 +14,7 @@ class KegiatanController extends Controller
      */
     public function index()
     {
-        $kegiatans = Kegiatan::with('details', 'ekskul') // Eager load the details and ekskul relationships
+        $kegiatans = Kegiatan::with('details', 'kelas_ekskul.ekskul') // Eager load the details and ekskul relationships
             ->orderBy('created_at', 'desc') // Sort by date ascending
             ->get();
         return new KegiatanResource(true, 'List of Kegiatan', $kegiatans);
@@ -24,7 +24,11 @@ class KegiatanController extends Controller
      */
     public function rekap($ekskul_id)
     {
-        $kegiatans = Kegiatan::with('details')->where('ekskul_id', $ekskul_id)->get();
+        $kegiatans = Kegiatan::with('details', 'kelasEkskul')
+            ->whereHas('kelasEkskul', function ($query) use ($ekskul_id) {
+                $query->where('ekskul_id', $ekskul_id); // Filter berdasarkan ekskul_id
+            })
+            ->get();
 
         $rekap = $kegiatans->map(function ($kegiatan) {
             $total = $kegiatan->details->count();
@@ -58,7 +62,7 @@ class KegiatanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ekskul_id' => 'required|exists:ekskuls,id',
+            'kelas_ekskul_id' => 'required|exists:kelas_ekskuls,id',
             'nama_kegiatan' => 'required|string|max:100',
             'kategori' => 'required|string|max:50',
             'tingkat' => 'required|string|max:50',
@@ -69,7 +73,7 @@ class KegiatanController extends Controller
             'absensis.*.keterangan' => 'nullable|string',
         ]);
         $kegiatan = Kegiatan::create([
-            'ekskul_id' => $validated['ekskul_id'],
+            'kelas_ekskul_id' => $validated['kelas_ekskul_id'],
             'nama_kegiatan' => $validated['nama_kegiatan'],
             'kategori' => $validated['kategori'],
             'tingkat' => $validated['tingkat'],
@@ -97,7 +101,7 @@ class KegiatanController extends Controller
         if (!$kegiatan) {
             return new KegiatanResource(false, 'Kegiatan Not Found', null);
         }
-        $kegiatan->load('details', 'ekskul');
+        $kegiatan->load('details', 'kelas_ekskul.ekskul');
         return new KegiatanResource(true, 'Kegiatan Found', $kegiatan);
     }
 
@@ -112,7 +116,7 @@ class KegiatanController extends Controller
             return new KegiatanResource(false, 'Kegiatan Not Found', null);
         }
         $validated = $request->validate([
-            'ekskul_id' => 'required|exists:ekskuls,id',
+            'kelas_ekskul_id' => 'required|exists:kelas_ekskuls,id',
             'nama_kegiatan' => 'required|string|max:100',
             'kategori' => 'required|string|max:50',
             'tingkat' => 'required|string|max:50',
@@ -123,7 +127,7 @@ class KegiatanController extends Controller
             'absensis.*.keterangan' => 'nullable|string',
         ]);
         $kegiatan->update([
-            'ekskul_id' => $validated['ekskul_id'],
+            'kelas_ekskul_id' => $validated['kelas_ekskul_id'],
             'nama_kegiatan' => $validated['nama_kegiatan'],
             'kategori' => $validated['kategori'],
             'tingkat' => $validated['tingkat'],
@@ -173,7 +177,7 @@ class KegiatanController extends Controller
                     $query->where('siswa_id', $siswaId);
                 },
                 // 'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
-                // 'ekskul'
+                'kelas_ekskul.ekskul'
             ])
             ->orderBy('tanggal_kegiatan', 'desc')
             ->get();
@@ -188,7 +192,7 @@ class KegiatanController extends Controller
         // Tambahkan field nama_ekskul pada setiap item
         $result = $kegiatans->map(function ($item) {
             $data = $item->toArray();
-            $data['nama_ekskul'] = $item->ekskul->nama_ekskul ?? null;
+            $data['nama_ekskul'] = $item->kelas_ekskul->ekskul->nama_ekskul ?? null;
             $data['nama_siswa'] = $item->details->first()->siswa->nama ?? null;
             return $data;
         });

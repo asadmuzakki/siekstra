@@ -19,22 +19,22 @@ class PendaftaranSeeder extends Seeder
         $pendaftarans = [
             [
                 'siswa_id' => 1,
-                'ekskul_id' => 1,
+                'kelas_ekskul_id' => 4,
                 'tanggal_pendaftaran' => Carbon::today()
             ],
             [
                 'siswa_id' => 2,
-                'ekskul_id' => 1,
-                'tanggal_pendaftaran' => Carbon::today()
-            ],
-            [
-                'siswa_id' => 1,
-                'ekskul_id' => 2,
+                'kelas_ekskul_id' => 4,
                 'tanggal_pendaftaran' => Carbon::today()
             ],
             [
                 'siswa_id' => 3,
-                'ekskul_id' => 3,
+                'kelas_ekskul_id' => 4,
+                'tanggal_pendaftaran' => Carbon::today()
+            ],
+            [
+                'siswa_id' => 4,
+                'kelas_ekskul_id' => 4,
                 'tanggal_pendaftaran' => Carbon::today()
             ],
         ];

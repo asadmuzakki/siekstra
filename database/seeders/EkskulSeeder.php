@@ -31,6 +31,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Ruang Seni',
                 'kelas_min' => 1,
                 'kelas_max' => 2,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264189/laravel_uploads/eajxapxtgrrsbofh9mii.jpg'
             ],
             [
                 'nama_ekskul' => 'Math Club',
@@ -39,6 +40,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Ruang Kelas',
                 'kelas_min' => 1,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264158/laravel_uploads/v2xdpvx7dlmgo3iwvgfn.jpg'
             ],
             [
                 'nama_ekskul' => 'Menggambar',
@@ -47,6 +49,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Ruang Seni',
                 'kelas_min' => 3,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264502/laravel_uploads/ldabrzmeha2imw5bs6ri.jpg'
             ],
             [
                 'nama_ekskul' => 'Robotika',
@@ -55,6 +58,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Lab Komputer',
                 'kelas_min' => 1,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264235/laravel_uploads/wdnj9bx2aktursthhtr3.jpg'
             ],
             [
                 'nama_ekskul' => 'Cooking Class',
@@ -63,6 +67,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Dapur Sekolah',
                 'kelas_min' => 4,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264257/laravel_uploads/mazrifsxbwza45wfidic.jpg'
             ],
             [
                 'nama_ekskul' => 'Hadroh',
@@ -71,6 +76,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Ruang Musik',
                 'kelas_min' => 3,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264278/laravel_uploads/j8pq0ij7f7owjt5ooz76.jpg'
             ],
             [
                 'nama_ekskul' => 'Karate',
@@ -79,6 +85,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Lapangan Olahraga',
                 'kelas_min' => 2,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264301/laravel_uploads/rwtxhhhtztw98yixjqrh.jpg'
             ],
             [
                 'nama_ekskul' => 'Bulutangkis',
@@ -87,6 +94,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Lapangan Bulutangkis',
                 'kelas_min' => 4,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264324/laravel_uploads/kqsafywqrdfamkokwj4l.jpg'
             ],
             [
                 'nama_ekskul' => 'Drumband',
@@ -95,6 +103,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Lapangan Sekolah',
                 'kelas_min' => 3,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264344/laravel_uploads/y3fwzhmqzfvq6tzedqb8.jpg'
             ],
             [
                 'nama_ekskul' => 'Futsal',
@@ -103,6 +112,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Lapangan Futsal',
                 'kelas_min' => 3,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264364/laravel_uploads/vfeuibkh9ixwxnxuaa9j.jpg'
             ],
             [
                 'nama_ekskul' => 'Sains Club',
@@ -111,6 +121,7 @@ class EkskulSeeder extends Seeder
                 'tempat' => 'Lab Sains',
                 'kelas_min' => 1,
                 'kelas_max' => 6,
+                'foto_url' => 'https://res.cloudinary.com/dbgidgaiq/image/upload/v1762264134/laravel_uploads/m0carrqubz8elzgfim9m.jpg'
             ],
         ];
 

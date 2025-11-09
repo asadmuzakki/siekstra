@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Api\SiswaController;
 use App\Http\Controllers\Api\EkskulController;
+use App\Http\Controllers\Api\KelasEkskulController;
 use App\Http\Controllers\Api\TesController;
 use App\Http\Controllers\Api\AbsensiController;
 use App\Http\Controllers\Api\KegiatanController;
@@ -47,6 +48,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/nilaiByDetail', [NilaiController::class, 'indexByNilai']);
     Route::get('/absensiByDetail', [AbsensiController::class, 'indexByAbsensi']);
     Route::apiResource('pendaftaran', \App\Http\Controllers\Api\PendaftaranController::class);
+    Route::prefix('kelas-ekskul')->group(function () {
+        Route::get('/', [KelasEkskulController::class, 'index']);
+        Route::get('/{id}', [KelasEkskulController::class, 'show']);
+        Route::post('/', [KelasEkskulController::class, 'store']);
+        Route::put('/{id}', [KelasEkskulController::class, 'update']);
+        Route::delete('/{id}', [KelasEkskulController::class, 'destroy']);
+    });
 });
 Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(function () {
     Route::get('/dashboard', function () {

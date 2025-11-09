@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('absensis', function (Blueprint $table) {
             $table->id();
             $table->string('agenda')->nullable();
-            $table->foreignId('ekskul_id')->constrained('ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('kelas_ekskul_id')->constrained('kelas_ekskuls', 'id')->onDelete('cascade')->onUpdate('cascade');
             $table->date('tanggal');
             $table->timestamps();
         });

@@ -37,7 +37,7 @@ class NilaiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ekskul_id' => 'required|exists:ekskuls,id',
+            'kelas_ekskul_id' => 'required|exists:kelas_ekskuls,id',
             'tanggal' => 'required|date',
             'penilaians' => 'required|array',
             'penilaians.*.siswa_id' => 'required|exists:siswas,id',
@@ -47,7 +47,7 @@ class NilaiController extends Controller
             'penilaians.*.keterangan' => 'nullable|string|max:255',
         ]);
         $nilai = Nilai::create([
-            'ekskul_id' => $validated['ekskul_id'],
+            'kelas_ekskul_id' => $validated['kelas_ekskul_id'],
             'tanggal' => $validated['tanggal'],
         ]);
         foreach ($validated['penilaians'] as $data) {
@@ -92,8 +92,10 @@ class NilaiController extends Controller
     public function showByEkskul($ekskulId, $total_page)
     {
         // $nilai = Nilai::with('details.siswa')->where('ekskul_id', $ekskulId)->first();
-        $nilais = Nilai::with('details') // Eager load the details relationship
-            ->where('ekskul_id', $ekskulId)
+        $nilais = Nilai::with('details', 'kelasEkskul.ekskul') // Eager load kelasEkskul dan ekskul
+            ->whereHas('kelasEkskul', function ($query) use ($ekskulId) {
+                $query->where('ekskul_id', $ekskulId); // Filter berdasarkan ekskul_id
+            })
             ->orderBy('created_at', 'desc')
             ->paginate($total_page);
 
@@ -116,7 +118,7 @@ class NilaiController extends Controller
         }
 
         $validated = $request->validate([
-            'ekskul_id' => 'required|exists:ekskuls,id',
+            'kelas_ekskul_id' => 'required|exists:kelas_ekskuls,id',
             'tanggal' => 'required|date',
             'penilaians' => 'required|array',
             'penilaians.*.siswa_id' => 'required|exists:siswas,id',
@@ -128,7 +130,7 @@ class NilaiController extends Controller
 
         // Update data utama nilai
         $nilai->update([
-            'ekskul_id' => $validated['ekskul_id'],
+            'kelas_ekskul_id' => $validated['kelas_ekskul_id'],
             'tanggal' => $validated['tanggal'],
         ]);
 
@@ -191,7 +193,7 @@ class NilaiController extends Controller
                     $query->where('siswa_id', $siswaId); // Filter hanya untuk siswa dengan ID spesifik
                 },
                 'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
-                'ekskul',        // Tambahkan relasi ekskul untuk mendapatkan nama_ekskul
+                'kelas_ekskul.ekskul',        // Tambahkan relasi ekskul untuk mendapatkan nama_ekskul
             ])
             ->orderBy('tanggal', 'desc')
             ->get();
@@ -208,7 +210,7 @@ class NilaiController extends Controller
             return [
                 'id' => $nilai->id,
                 'tanggal' => $nilai->tanggal,
-                'nama_ekskul' => $nilai->ekskul->nama_ekskul ?? null, // Ambil nama ekskul
+                'nama_ekskul' => $nilai->kelas_ekskul->ekskul->nama_ekskul ?? null, // Ambil nama ekskul
                 'details' => $nilai->details->map(function ($detail) {
                     return [
                         'siswa_id' => $detail->siswa_id,
@@ -256,9 +258,10 @@ class NilaiController extends Controller
                     ->orderBy('siswas.kelas', $sortOrder);
             })
             ->when($sortBy === 'ekskul', function ($query) use ($sortOrder) {
-                $query->join('nilais', 'detail_nilais.nilai_id', '=', 'nilais.id')
-                    ->join('ekskuls', 'nilais.ekskul_id', '=', 'ekskuls.id')
-                    ->orderBy('ekskuls.nama_ekskul', $sortOrder);
+            $query->join('nilais', 'detail_nilais.nilai_id', '=', 'nilais.id')
+                ->join('kelas_ekskuls', 'nilais.kelas_ekskul_id', '=', 'kelas_ekskuls.id')
+                ->join('ekskuls', 'kelas_ekskuls.ekskul_id', '=', 'ekskuls.id')
+                ->orderBy('ekskuls.nama_ekskul', $sortOrder);
             }, function ($query) use ($sortBy, $sortOrder) {
                 $query->orderBy($sortBy, $sortOrder); // Default sorting
             })
@@ -276,8 +279,8 @@ class NilaiController extends Controller
             return [
                 'nilai_id' => $detail->nilai_id,
                 'tanggal' => $detail->nilai->tanggal,
-                'ekskul_id' => $detail->nilai->ekskul_id,
-                'nama_ekskul' => $detail->nilai->ekskul->nama_ekskul ?? null,
+                'ekskul_id' => $detail->nilai->kelas_ekskul->ekskul->ekskul_id,
+                'nama_ekskul' => $detail->nilai->kelas_ekskul->ekskul->nama_ekskul ?? null,
                 'siswa_id' => $detail->siswa->id,
                 'nama_siswa' => $detail->siswa->nama,
                 'kelas' => $detail->siswa->kelas,
