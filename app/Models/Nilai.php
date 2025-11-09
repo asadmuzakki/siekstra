@@ -23,4 +23,8 @@ class Nilai extends Model
     {
         return $this->belongsTo(KelasEkskul::class, 'kelas_ekskul_id');
     }
+    public function detailNilai()
+    {
+        return $this->hasMany(DetailNilai::class);
+    }
 }
