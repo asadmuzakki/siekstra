@@ -21,6 +21,6 @@ class Nilai extends Model
     }
     public function kelas_ekskul()
     {
-        return $this->belongsTo(Kelas_Ekskul::class, 'kelas_ekskul_id');
+        return $this->belongsTo(KelasEkskul::class, 'kelas_ekskul_id');
     }
 }

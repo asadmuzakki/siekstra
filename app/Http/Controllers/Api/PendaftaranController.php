@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pendaftaran;
-use App\Models\Kelas_Ekskul;
+use App\Models\KelasEkskul;
 use App\Models\DetailNilai;
 use App\Http\Resources\PendaftaranResource;
 use Illuminate\Http\Request;
@@ -53,7 +53,7 @@ class PendaftaranController extends Controller
         DB::beginTransaction();
 
         try {
-            $kelas = Kelas_Ekskul::with('nilai')->findOrFail($validated['kelas_ekskul_id']);
+            $kelas = KelasEkskul::with('nilai')->findOrFail($validated['kelas_ekskul_id']);
 
             // Jika kelas nonaktif → tolak pendaftaran
             if ($kelas->status === 'Nonaktif') {
@@ -162,7 +162,7 @@ class PendaftaranController extends Controller
             }
 
             // Hapus detail nilai untuk siswa ini
-            $kelas = Kelas_Ekskul::with('nilai')->findOrFail($pendaftaran->kelas_ekskul_id);
+            $kelas = KelasEkskul::with('nilai')->findOrFail($pendaftaran->kelas_ekskul_id);
             $nilai = $kelas->nilai->first();
 
             if ($nilai) {

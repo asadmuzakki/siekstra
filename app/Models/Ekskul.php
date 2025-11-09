@@ -32,6 +32,6 @@ class Ekskul extends Model
     // }
     public function kelas_ekskuls()
     {
-        return $this->hasMany(Kelas_Ekskul::class);
+        return $this->hasMany(KelasEkskul::class);
     }
 }

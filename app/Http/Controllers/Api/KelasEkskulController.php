@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kelas_Ekskul;
+use App\Models\KelasEkskul;
 use App\Models\Ekskul;
 use App\Models\Nilai;
 use App\Models\DetailNilai;
@@ -19,7 +19,7 @@ class KelasEkskulController extends Controller
      */
     public function index()
     {
-        $kelas = Kelas_Ekskul::with('ekskul', 'nilai.detailNilai.siswa')->get();
+        $kelas = KelasEkskul::with('ekskul', 'nilai.detailNilai.siswa')->get();
         return new KelasEkskulResource(true, 'List of Kelas Ekskul', $kelas);
     }
 
@@ -28,7 +28,7 @@ class KelasEkskulController extends Controller
      */
     public function show($id)
     {
-        $kelas = Kelas_Ekskul::with('ekskul', 'nilai.detailNilai.siswa')->findOrFail($id);
+        $kelas = KelasEkskul::with('ekskul', 'nilai.detailNilai.siswa')->findOrFail($id);
         return new KelasEkskulResource(true, 'Detail Kelas Ekskul', $kelas);
     }
 
@@ -49,7 +49,7 @@ class KelasEkskulController extends Controller
 
         try {
             // 1️⃣ Buat kelas ekskul baru
-            $kelas = Kelas_Ekskul::create([
+            $kelas = KelasEkskul::create([
                 'ekskul_id' => $validated['ekskul_id'],
                 'nama_kelas' => $validated['nama_kelas'],
                 'tahun_ajaran' => $validated['tahun_ajaran'],
@@ -78,7 +78,7 @@ class KelasEkskulController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $kelas = Kelas_Ekskul::findOrFail($id);
+        $kelas = KelasEkskul::findOrFail($id);
 
         $validated = $request->validate([
             'nama_kelas' => 'sometimes|string|max:100',
@@ -100,7 +100,7 @@ class KelasEkskulController extends Controller
         DB::beginTransaction();
 
         try {
-            $kelas = Kelas_Ekskul::with('nilai.detailNilai')->findOrFail($id);
+            $kelas = KelasEkskul::with('nilai.detailNilai')->findOrFail($id);
 
             // Hapus semua nilai dan detail nilai
             foreach ($kelas->nilai as $nilai) {

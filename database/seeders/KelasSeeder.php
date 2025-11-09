@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Kelas_Ekskul;
+use App\Models\KelasEkskul;
 use App\Models\Ekskul;
 use App\Models\Nilai;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +27,7 @@ class KelasSeeder extends Seeder
             foreach ($ekskuls as $ekskul) {
                 // Tambahkan contoh 2 kelas per ekskul
                 for ($i = 1; $i <= 2; $i++) {
-                    $kelas = Kelas_Ekskul::create([
+                    $kelas = KelasEkskul::create([
                         'nama_kelas' => "Kelas {$i} {$ekskul->nama_ekskul}",
                         'ekskul_id' => $ekskul->id,
                         'tahun_ajaran' => '2025/2026',
