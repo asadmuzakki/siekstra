@@ -75,6 +75,7 @@ Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(functi
     // Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
     Route::apiResource('ekskul', EkskulController::class);
     Route::get('/getkelasByEkskul/{ekskulId}', [KelasEkskulController::class, 'getKelasByIdEkskul']);
+    Route::get('/nilaiByIdEkskul/{ekskul_id}', [NilaiController::class, 'getNilaiByIdEkskul']);
 });
 Route::middleware(['auth:sanctum', 'role:wali_murid'])->prefix('wali_murid')->group(function () {
     Route::get('/dashboard', function () {

@@ -330,4 +330,46 @@ class NilaiController extends Controller
         return new NilaiResource(true, 'List of Nilai Details', $result);
     }
 
+    public function getNilaiByIdEkskul($idEkskul)
+    {
+        // Ambil semua data nilai yang terkait dengan ekskul tertentu
+        $nilais = Nilai::with(['details.siswa', 'kelas_ekskul.ekskul'])
+            ->whereHas('kelas_ekskul', function ($query) use ($idEkskul) {
+                $query->where('ekskul_id', $idEkskul);
+            })
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        // Jika tidak ada data ditemukan
+        if ($nilais->isEmpty()) {
+            return new NilaiResource(false, 'Tidak ada data nilai untuk ekskul ini', null);
+        }
+
+        // Format hasil agar lebih rapi untuk response API
+        $result = $nilais->map(function ($nilai) {
+            return [
+                'nilai_id' => $nilai->id,
+                'tanggal' => $nilai->tanggal,
+                'nama_ekskul' => $nilai->kelas_ekskul->ekskul->nama_ekskul ?? '-',
+                'kelas_ekskul_id' => $nilai->kelas_ekskul_id,
+                'details' => $nilai->details->map(function ($detail) {
+                    return [
+                        'siswa_id' => $detail->siswa_id,
+                        'nama_siswa' => $detail->siswa->nama ?? '-',
+                        'kelas' => $detail->siswa->kelas ?? '-',
+                        'kehadiran' => $detail->kehadiran,
+                        'keaktifan' => $detail->keaktifan,
+                        'praktik' => $detail->praktik,
+                        'nilai_akhir' => $detail->nilai_akhir,
+                        'index_nilai' => $detail->index_nilai,
+                        'keterangan' => $detail->keterangan,
+                    ];
+                }),
+            ];
+        });
+
+        return new NilaiResource(true, 'Daftar Nilai Berdasarkan Ekskul', $result);
+    }
+
+
 }
