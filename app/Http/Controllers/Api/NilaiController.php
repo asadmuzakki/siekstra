@@ -91,20 +91,22 @@ class NilaiController extends Controller
     // buat showByIdEkskul
     public function showByEkskul($ekskulId, $total_page)
     {
-        // $nilai = Nilai::with('details.siswa')->where('ekskul_id', $ekskulId)->first();
-        $nilais = Nilai::with('details', 'kelasEkskul.ekskul') // Eager load kelasEkskul dan ekskul
-            ->whereHas('kelasEkskul', function ($query) use ($ekskulId) {
-                $query->where('ekskul_id', $ekskulId); // Filter berdasarkan ekskul_id
+        // Ambil nilais yang terkait dengan ekskul tertentu lewat relasi kelas_ekskul
+        $nilais = Nilai::with(['details.siswa', 'kelas_ekskul.ekskul'])
+            ->whereHas('kelas_ekskul', function ($query) use ($ekskulId) {
+                $query->where('ekskul_id', $ekskulId);
             })
             ->orderBy('created_at', 'desc')
             ->paginate($total_page);
 
-        if (!$nilais) {
+        // paginate selalu mengembalikan paginator — cek apakah tidak ada item
+        if ($nilais->isEmpty()) {
             return new NilaiResource(false, 'Nilai Not Found', null);
         }
 
         return new NilaiResource(true, 'Nilai Found', $nilais);
     }
+
 
     /**
      * Update the specified resource in storage.
