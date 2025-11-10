@@ -73,7 +73,7 @@ class EkskulController extends Controller
         if ($ekskuls->isEmpty()) {
             return new EkskulResource(false, 'No Ekskul found for this user', null);
         }
-
+        $ekskuls->load(['tutor', 'kelas_ekskuls']);
         return new EkskulResource(true, 'Ekskul Found', $ekskuls);
     }
 
