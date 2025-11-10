@@ -56,7 +56,7 @@ class DashboardController extends Controller
         $tahun = $request->query('tahun', now()->year); // default: tahun sekarang
 
         // Ambil semua ekskul dengan kelas_ekskul dan pendaftarannya di tahun tersebut
-        $data = \App\Models\Ekskul::with([
+        $data = Ekskul::with([
             'kelas_ekskuls.pendaftarans' => function ($q) use ($tahun) {
                 $q->whereYear('tanggal_pendaftaran', $tahun);
             }
