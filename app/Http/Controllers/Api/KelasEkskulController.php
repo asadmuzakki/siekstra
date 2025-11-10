@@ -17,9 +17,20 @@ class KelasEkskulController extends Controller
     /**
      * Menampilkan semua kelas ekskul.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kelas = KelasEkskul::with('ekskul', 'nilai.detailNilai.siswa')->get();
+        $tahun = $request->query('tahun');   // contoh: 2025
+        $periode = $request->query('periode'); // contoh: Ganjil / Genap
+
+        $kelas = KelasEkskul::with(['ekskul', 'nilai.details.siswa'])
+            ->when($tahun, function ($query) use ($tahun) {
+                $query->where('tahun_ajaran', $tahun);
+            })
+            ->when($periode, function ($query) use ($periode) {
+                $query->where('periode', $periode);
+            })
+            ->get();
+
         return new KelasEkskulResource(true, 'List of Kelas Ekskul', $kelas);
     }
 
@@ -65,7 +76,7 @@ class KelasEkskulController extends Controller
 
             DB::commit();
 
-            return new KelasEkskulResource(true, 'Kelas ekskul berhasil dibuat dan nilai kosong telah ditambahkan.',[ $kelas, $nilai ]);
+            return new KelasEkskulResource(true, 'Kelas ekskul berhasil dibuat dan nilai kosong telah ditambahkan.', [$kelas, $nilai]);
 
         } catch (\Throwable $e) {
             DB::rollBack();
