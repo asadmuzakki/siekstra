@@ -88,24 +88,44 @@ class NilaiController extends Controller
 
         return new NilaiResource(true, 'Nilai Found', $nilai);
     }
-    // buat showByIdEkskul
-    public function showByEkskul($ekskulId, $total_page)
+    public function showByEkskul(Request $request, $ekskulId, $total_page)
     {
-        // Ambil nilais yang terkait dengan ekskul tertentu lewat relasi kelas_ekskul
+        // Ambil parameter dari query string
+        $periodeFilter = $request->query('periode'); // contoh: "Ganjil" atau "Genap"
+        $tahunFilter = $request->query('tahun');     // contoh: 2025
+
+        // Tentukan periode aktif berdasarkan bulan sekarang
+        $bulanSekarang = now()->month;
+        $periodeAktif = $bulanSekarang >= 7 ? 'Ganjil' : 'Genap';
+        $tahunSekarang = now()->year;
+
+        // Gunakan filter manual jika dikirim, kalau tidak pakai default saat ini
+        $periode = $periodeFilter ?? $periodeAktif;
+        $tahun = $tahunFilter ?? $tahunSekarang;
+
+        // Ambil data nilai berdasarkan ekskul, periode, dan tahun dari field "tanggal"
         $nilais = Nilai::with(['details.siswa', 'kelas_ekskul.ekskul'])
             ->whereHas('kelas_ekskul', function ($query) use ($ekskulId) {
                 $query->where('ekskul_id', $ekskulId);
             })
-            ->orderBy('created_at', 'desc')
+            ->when($periode, function ($query) use ($periode) {
+                $query->where('periode', $periode);
+            })
+            ->when($tahun, function ($query) use ($tahun) {
+                $query->whereYear('tanggal', $tahun);
+            })
+            ->orderBy('created_at', 'asc')
             ->paginate($total_page);
 
-        // paginate selalu mengembalikan paginator — cek apakah tidak ada item
+        // Jika data kosong
         if ($nilais->isEmpty()) {
-            return new NilaiResource(false, 'Nilai Not Found', null);
+            return new NilaiResource(false, "Tidak ada nilai untuk periode $periode tahun $tahun", null);
         }
 
-        return new NilaiResource(true, 'Nilai Found', $nilais);
+        // Jika data ditemukan
+        return new NilaiResource(true, "Nilai Ekskul tahun $tahun periode $periode", $nilais);
     }
+
 
 
     /**
