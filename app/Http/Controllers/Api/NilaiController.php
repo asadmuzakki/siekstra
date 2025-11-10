@@ -90,41 +90,34 @@ class NilaiController extends Controller
     }
     public function showByEkskul(Request $request, $ekskulId, $total_page)
     {
-        // Ambil parameter dari query string
-        $periodeFilter = $request->query('periode'); // contoh: "Ganjil" atau "Genap"
+        $periodeFilter = $request->query('periode'); // contoh: "Ganjil" / "Genap"
         $tahunFilter = $request->query('tahun');     // contoh: 2025
 
-        // Tentukan periode aktif berdasarkan bulan sekarang
         $bulanSekarang = now()->month;
         $periodeAktif = $bulanSekarang >= 7 ? 'Ganjil' : 'Genap';
         $tahunSekarang = now()->year;
 
-        // Gunakan filter manual jika dikirim, kalau tidak pakai default saat ini
         $periode = $periodeFilter ?? $periodeAktif;
         $tahun = $tahunFilter ?? $tahunSekarang;
 
-        // Ambil data nilai berdasarkan ekskul, periode, dan tahun dari field "tanggal"
         $nilais = Nilai::with(['details.siswa', 'kelas_ekskul.ekskul'])
-            ->whereHas('kelas_ekskul', function ($query) use ($ekskulId) {
-                $query->where('ekskul_id', $ekskulId);
-            })
-            ->when($periode, function ($query) use ($periode) {
-                $query->where('periode', $periode);
+            ->whereHas('kelas_ekskul', function ($query) use ($ekskulId, $periode) {
+                $query->where('ekskul_id', $ekskulId)
+                    ->when($periode, fn($q) => $q->where('periode', $periode)); // 🔥 filter periode disini
             })
             ->when($tahun, function ($query) use ($tahun) {
-                $query->whereYear('tanggal', $tahun);
+                $query->whereYear('tanggal', $tahun); // filter tahun berdasarkan field tanggal di tabel nilai
             })
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'desc')
             ->paginate($total_page);
 
-        // Jika data kosong
         if ($nilais->isEmpty()) {
             return new NilaiResource(false, "Tidak ada nilai untuk periode $periode tahun $tahun", null);
         }
 
-        // Jika data ditemukan
         return new NilaiResource(true, "Nilai Ekskul tahun $tahun periode $periode", $nilais);
     }
+
 
 
 
