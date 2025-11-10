@@ -12,13 +12,29 @@ class SiswaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $siswas = Siswa::with('pendaftarans.kelas_ekskul.ekskul') // Eager load the ekskuls relationship
+        $kelas = $request->query('kelas');
+
+        $siswas = Siswa::with('pendaftarans.kelas_ekskul.ekskul')
+            ->when($kelas, function ($query) use ($kelas) {
+                // Gunakan LIKE agar "1" cocok dengan "1A", "1B", dst.
+                $query->where('kelas', 'like', $kelas . '%');
+            })
             ->orderBy('created_at', 'asc')
             ->get();
+
+        if ($siswas->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada siswa ditemukan untuk kelas yang diminta.',
+                'data' => [],
+            ], 404);
+        }
+
         return new SiswaResource(true, 'List of Siswas', $siswas);
     }
+
 
     /**
      * Store a newly created resource in storage.
