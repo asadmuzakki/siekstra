@@ -69,7 +69,7 @@ Route::middleware(['auth:sanctum', 'role:tutor'])->prefix('tutor')->group(functi
     Route::get('/nilaiByEkskul/{ekskul_id}/{total_page}', [NilaiController::class, 'showByEkskul']);
     Route::apiResource('kegiatan', KegiatanController::class);
     Route::apiResource('pendaftaran', \App\Http\Controllers\Api\PendaftaranController::class);
-    Route::get('/pendaftaranByEkskul/{ekskul_id}', [\App\Http\Controllers\Api\PendaftaranController::class, 'showByEkskul']);
+    Route::get('/pendaftaranByEkskul/{ekskul_id}', [\App\Http\Controllers\Api\PendaftaranController::class, 'showBykelasEkskul']);
     Route::apiResource('siswas', SiswaController::class);
     Route::get('/ekskulByUser/{userId}', [EkskulController::class, 'showByUserId']);
     // Route::apiResource('absensi', \App\Http\Controllers\Api\AbsensiController::class);
