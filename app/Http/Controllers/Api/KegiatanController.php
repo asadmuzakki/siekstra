@@ -24,8 +24,8 @@ class KegiatanController extends Controller
      */
     public function rekap($ekskul_id)
     {
-        $kegiatans = Kegiatan::with('details', 'kelasEkskul')
-            ->whereHas('kelasEkskul', function ($query) use ($ekskul_id) {
+        $kegiatans = Kegiatan::with('details', 'kelas_ekskul')
+            ->whereHas('kelas_ekskul', function ($query) use ($ekskul_id) {
                 $query->where('ekskul_id', $ekskul_id); // Filter berdasarkan ekskul_id
             })
             ->get();
