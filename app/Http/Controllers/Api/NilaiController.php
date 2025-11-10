@@ -179,43 +179,60 @@ class NilaiController extends Controller
         return new NilaiResource(true, 'Nilai Deleted Successfully', null);
     }
 
-    public function showBySiswaId($siswaId, $tahun = null)
+    public function showBySiswaId($siswaId, $tahun = null, $periode = null)
     {
         // Ambil nilai berdasarkan siswa_id dari relasi details
         $nilais = Nilai::whereHas('details', function ($query) use ($siswaId) {
             $query->where('siswa_id', $siswaId);
         })
+            // 🔹 Filter berdasarkan tahun dari kolom tanggal
             ->when($tahun, function ($query) use ($tahun) {
-                $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun jika diberikan
+                $query->whereYear('tanggal', $tahun);
+            })
+            // 🔹 Filter berdasarkan periode (Ganjil / Genap)
+            ->when($periode, function ($query) use ($periode) {
+                if (strtolower($periode) === 'ganjil') {
+                    // Periode Ganjil: Juli - Desember
+                    $query->whereMonth('tanggal', '>=', 7)
+                        ->whereMonth('tanggal', '<=', 12);
+                } elseif (strtolower($periode) === 'genap') {
+                    // Periode Genap: Januari - Juni
+                    $query->whereMonth('tanggal', '>=', 1)
+                        ->whereMonth('tanggal', '<=', 6);
+                }
             })
             ->with([
+                // Relasi detail nilai siswa tertentu
                 'details' => function ($query) use ($siswaId) {
-                    $query->where('siswa_id', $siswaId); // Filter hanya untuk siswa dengan ID spesifik
+                    $query->where('siswa_id', $siswaId);
                 },
-                'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
-                'kelas_ekskul.ekskul',        // Tambahkan relasi ekskul untuk mendapatkan nama_ekskul
+                'details.siswa',           // Ambil info siswa
+                'kelas_ekskul.ekskul',     // Ambil info ekskul
             ])
             ->orderBy('tanggal', 'desc')
             ->get();
 
+        // 🔸 Jika tidak ada data
         if ($nilais->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No Nilai Found for the Given Siswa and Year',
+                'message' => 'No Nilai Found for the Given Siswa, Year, or Period',
             ], 404);
         }
 
-        // Tambahkan field nama_ekskul dan kelas siswa pada setiap item
+        // 🔧 Format data agar lebih mudah digunakan di frontend
         $result = $nilais->map(function ($nilai) {
             return [
                 'id' => $nilai->id,
                 'tanggal' => $nilai->tanggal,
-                'nama_ekskul' => $nilai->kelas_ekskul->ekskul->nama_ekskul ?? null, // Ambil nama ekskul
+                'nama_ekskul' => $nilai->kelas_ekskul->ekskul->nama_ekskul ?? null,
+                'periode' => $nilai->kelas_ekskul->periode ?? null,
+                'tahun_ajaran' => $nilai->kelas_ekskul->tahun_ajaran ?? null,
                 'details' => $nilai->details->map(function ($detail) {
                     return [
                         'siswa_id' => $detail->siswa_id,
-                        'nama_siswa' => $detail->siswa->nama ?? null, // Ambil nama siswa
-                        'kelas' => $detail->siswa->kelas ?? null,     // Ambil kelas siswa
+                        'nama_siswa' => $detail->siswa->nama ?? null,
+                        'kelas' => $detail->siswa->kelas ?? null,
                         'kehadiran' => $detail->kehadiran,
                         'keaktifan' => $detail->keaktifan,
                         'praktik' => $detail->praktik,
@@ -230,12 +247,14 @@ class NilaiController extends Controller
         return new NilaiResource(true, 'Nilai Found for Siswa', $result);
     }
 
+
     public function indexByNilai(Request $request)
     {
         // Ambil parameter sorting dan filter dari query string
         $sortBy = $request->query('sort_by', 'nilai_id'); // Default: nilai_id
         $sortOrder = $request->query('sort_order', 'desc'); // Default: desc
         $tahun = $request->query('tahun'); // Filter berdasarkan tahun
+        $periode = $request->query('periode'); // Filter berdasarkan semester (Ganjil/Genap)
 
         // Validasi parameter sorting
         $allowedSortBy = ['kelas', 'ekskul', 'nilai_id'];
@@ -246,27 +265,43 @@ class NilaiController extends Controller
             ], 400);
         }
 
-        // Ambil data dari tabel nilai_details dengan relasi siswa dan nilai
-        $detailNilais = \App\Models\DetailNilai::with(['siswa', 'nilai.ekskul'])
-            ->when($tahun, function ($query) use ($tahun) {
-                $query->whereHas('nilai', function ($query) use ($tahun) {
-                    $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun
-                });
+        // Ambil data dari tabel detail_nilais dengan relasi siswa dan nilai
+        $detailNilais = \App\Models\DetailNilai::with(['siswa', 'nilai.kelas_ekskul.ekskul'])
+            ->whereHas('nilai', function ($query) use ($tahun, $periode) {
+                // 🔹 Filter tahun dari tanggal nilai
+                if ($tahun) {
+                    $query->whereYear('tanggal', $tahun);
+                }
+
+                // 🔹 Filter periode dari tanggal nilai
+                if ($periode === 'Ganjil') {
+                    // Juli–Desember
+                    $query->whereMonth('tanggal', '>=', 7)
+                        ->whereMonth('tanggal', '<=', 12);
+                } elseif ($periode === 'Genap') {
+                    // Januari–Juni
+                    $query->whereMonth('tanggal', '>=', 1)
+                        ->whereMonth('tanggal', '<=', 6);
+                }
             })
+            // 🔹 Sorting dinamis
             ->when($sortBy === 'kelas', function ($query) use ($sortOrder) {
                 $query->join('siswas', 'detail_nilais.siswa_id', '=', 'siswas.id')
-                    ->orderBy('siswas.kelas', $sortOrder);
+                    ->orderBy('siswas.kelas', $sortOrder)
+                    ->select('detail_nilais.*'); // Hindari duplikasi kolom
             })
             ->when($sortBy === 'ekskul', function ($query) use ($sortOrder) {
-            $query->join('nilais', 'detail_nilais.nilai_id', '=', 'nilais.id')
-                ->join('kelas_ekskuls', 'nilais.kelas_ekskul_id', '=', 'kelas_ekskuls.id')
-                ->join('ekskuls', 'kelas_ekskuls.ekskul_id', '=', 'ekskuls.id')
-                ->orderBy('ekskuls.nama_ekskul', $sortOrder);
+                $query->join('nilais', 'detail_nilais.nilai_id', '=', 'nilais.id')
+                    ->join('kelas_ekskuls', 'nilais.kelas_ekskul_id', '=', 'kelas_ekskuls.id')
+                    ->join('ekskuls', 'kelas_ekskuls.ekskul_id', '=', 'ekskuls.id')
+                    ->orderBy('ekskuls.nama_ekskul', $sortOrder)
+                    ->select('detail_nilais.*');
             }, function ($query) use ($sortBy, $sortOrder) {
-                $query->orderBy($sortBy, $sortOrder); // Default sorting
+                $query->orderBy($sortBy, $sortOrder);
             })
             ->get();
 
+        // Jika data kosong
         if ($detailNilais->isEmpty()) {
             return response()->json([
                 'success' => false,
@@ -274,12 +309,12 @@ class NilaiController extends Controller
             ], 404);
         }
 
-        // Format data untuk ditampilkan per nilai
+        // 🔧 Format hasil data agar rapi
         $result = $detailNilais->map(function ($detail) {
             return [
                 'nilai_id' => $detail->nilai_id,
                 'tanggal' => $detail->nilai->tanggal,
-                'ekskul_id' => $detail->nilai->kelas_ekskul->ekskul->ekskul_id,
+                'ekskul_id' => $detail->nilai->kelas_ekskul->ekskul->id ?? null,
                 'nama_ekskul' => $detail->nilai->kelas_ekskul->ekskul->nama_ekskul ?? null,
                 'siswa_id' => $detail->siswa->id,
                 'nama_siswa' => $detail->siswa->nama,
@@ -292,4 +327,5 @@ class NilaiController extends Controller
 
         return new NilaiResource(true, 'List of Nilai Details', $result);
     }
+
 }

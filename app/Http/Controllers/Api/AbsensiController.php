@@ -15,7 +15,7 @@ class AbsensiController extends Controller
     public function index()
     {
         $absensis = Absensi::with('details') // Eager load the details relationship
-            ->orderBy('created_at', 'desc') // Sort by date descending
+            ->orderBy('created_at', 'asc') // Sort by date ascending
             ->get();
         return new AbsensiResource(true, 'List of Absensi', $absensis);
     }
@@ -25,7 +25,7 @@ class AbsensiController extends Controller
     public function rekap($ekskul_id)
     {
         $absensis = Absensi::with('details', 'kelas_ekskul.ekskul')
-            ->whereHas('kelasEkskul', function ($query) use ($ekskul_id) {
+            ->whereHas('kelas_ekskul', function ($query) use ($ekskul_id) {
                 $query->where('ekskul_id', $ekskul_id); // Filter berdasarkan ekskul_id
             })
             ->get();
@@ -163,20 +163,32 @@ class AbsensiController extends Controller
         return new AbsensiResource(true, 'Absensi Deleted Successfully', null);
     }
 
-    public function showBySiswaId($siswaId, $tahun = null)
+    public function showBySiswaId($siswaId, $tahun = null, $periode = null)
     {
-        // Ambil absensi berdasarkan siswa_id dari relasi details
         $absensis = Absensi::whereHas('details', function ($query) use ($siswaId) {
             $query->where('siswa_id', $siswaId);
         })
+            // 🔥 Filter berdasarkan tahun dari tanggal absensi
             ->when($tahun, function ($query) use ($tahun) {
-                $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun jika diberikan
+                $query->whereYear('tanggal', $tahun);
+            })
+            // 🔥 Filter berdasarkan periode dari tanggal absensi
+            ->when($periode, function ($query) use ($periode) {
+                if ($periode === 'Ganjil') {
+                    // Juli–Desember
+                    $query->whereMonth('tanggal', '>=', 7)
+                        ->whereMonth('tanggal', '<=', 12);
+                } elseif ($periode === 'Genap') {
+                    // Januari–Juni
+                    $query->whereMonth('tanggal', '>=', 1)
+                        ->whereMonth('tanggal', '<=', 6);
+                }
             })
             ->with([
                 'details' => function ($query) use ($siswaId) {
                     $query->where('siswa_id', $siswaId);
                 },
-                'kelas_ekskul', // Tambahkan relasi kelas_ekskul
+                'kelas_ekskul.ekskul',
             ])
             ->orderBy('tanggal', 'desc')
             ->get();
@@ -184,21 +196,23 @@ class AbsensiController extends Controller
         if ($absensis->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No Absensi Found for the Given Siswa and Year',
+                'message' => 'No Absensi Found for the Given Siswa and Filters',
             ], 404);
         }
 
-        // Tambahkan field nama_siswa dan nama_ekskul pada setiap item
+        // 🔧 Format responsenya
         $result = $absensis->map(function ($absensi) {
             return [
                 'id' => $absensi->id,
                 'tanggal' => $absensi->tanggal,
                 'agenda' => $absensi->agenda,
-                'nama_ekskul' => $absensi->kelas_ekskul->ekskul->nama_ekskul ?? null, // Tambahkan nama kelas ekskul
+                'nama_ekskul' => $absensi->kelas_ekskul->ekskul->nama_ekskul ?? null,
+                'periode' => $absensi->kelas_ekskul->periode ?? null,
+                'tahun_ajaran' => $absensi->kelas_ekskul->tahun_ajaran ?? null,
                 'details' => $absensi->details->map(function ($detail) {
                     return [
                         'siswa_id' => $detail->siswa_id,
-                        'nama_siswa' => $detail->siswa->nama ?? null, // Tambahkan nama siswa
+                        'nama_siswa' => $detail->siswa->nama ?? null,
                         'status' => $detail->status,
                         'keterangan' => $detail->keterangan,
                     ];
@@ -209,14 +223,16 @@ class AbsensiController extends Controller
         return new AbsensiResource(true, 'Absensi Found for Siswa', $result);
     }
 
+
+
     public function indexByAbsensi(Request $request)
     {
-        // Ambil parameter sorting dan filter dari query string
         $sortBy = $request->query('sort_by', 'absensi_id'); // Default: absensi_id
         $sortOrder = $request->query('sort_order', 'desc'); // Default: desc
         $tahun = $request->query('tahun'); // Filter berdasarkan tahun
+        $periode = $request->query('periode'); // Filter berdasarkan semester (Ganjil/Genap)
 
-        // Validasi parameter sorting
+        // Validasi parameter sort_by
         $allowedSortBy = ['kelas', 'ekskul', 'absensi_id'];
         if (!in_array($sortBy, $allowedSortBy)) {
             return response()->json([
@@ -225,24 +241,39 @@ class AbsensiController extends Controller
             ], 400);
         }
 
-        // Ambil data dari tabel absensi_details dengan relasi siswa dan absensi
+        // Query utama
         $detailAbsensis = \App\Models\DetailAbsensi::with(['siswa', 'absensi.kelas_ekskul.ekskul'])
-            ->when($tahun, function ($query) use ($tahun) {
-                $query->whereHas('absensi', function ($query) use ($tahun) {
-                    $query->whereYear('tanggal', $tahun); // Filter berdasarkan tahun
-                });
+            ->whereHas('absensi', function ($query) use ($tahun, $periode) {
+                // 🔹 Filter tahun dari tanggal absensi
+                if ($tahun) {
+                    $query->whereYear('tanggal', $tahun);
+                }
+
+                // 🔹 Filter periode dari tanggal absensi
+                if ($periode === 'Ganjil') {
+                    // Juli–Desember
+                    $query->whereMonth('tanggal', '>=', 7)
+                        ->whereMonth('tanggal', '<=', 12);
+                } elseif ($periode === 'Genap') {
+                    // Januari–Juni
+                    $query->whereMonth('tanggal', '>=', 1)
+                        ->whereMonth('tanggal', '<=', 6);
+                }
             })
+            // 🔹 Sorting dinamis
             ->when($sortBy === 'kelas', function ($query) use ($sortOrder) {
                 $query->join('siswas', 'detail_absensis.siswa_id', '=', 'siswas.id')
-                    ->orderBy('siswas.kelas', $sortOrder);
+                    ->orderBy('siswas.kelas', $sortOrder)
+                    ->select('detail_absensis.*'); // Hindari duplikasi kolom
             })
             ->when($sortBy === 'ekskul', function ($query) use ($sortOrder) {
                 $query->join('absensis', 'detail_absensis.absensi_id', '=', 'absensis.id')
                     ->join('kelas_ekskuls', 'absensis.kelas_ekskul_id', '=', 'kelas_ekskuls.id')
                     ->join('ekskuls', 'kelas_ekskuls.ekskul_id', '=', 'ekskuls.id')
-                    ->orderBy('ekskuls.nama_ekskul', $sortOrder);
+                    ->orderBy('ekskuls.nama_ekskul', $sortOrder)
+                    ->select('detail_absensis.*');
             }, function ($query) use ($sortBy, $sortOrder) {
-                $query->orderBy($sortBy, $sortOrder); // Default sorting
+                $query->orderBy($sortBy, $sortOrder);
             })
             ->get();
 
@@ -253,12 +284,12 @@ class AbsensiController extends Controller
             ], 404);
         }
 
-        // Format data untuk ditampilkan per absensi
+        // 🔧 Format hasil agar rapi
         $result = $detailAbsensis->map(function ($detail) {
             return [
                 'absensi_id' => $detail->absensi_id,
                 'tanggal' => $detail->absensi->tanggal,
-                'ekskul_id' => $detail->absensi->kelas_ekskul->ekskul->ekskul_id,
+                'ekskul_id' => $detail->absensi->kelas_ekskul->ekskul->id ?? null,
                 'nama_ekskul' => $detail->absensi->kelas_ekskul->ekskul->nama_ekskul ?? null,
                 'siswa_id' => $detail->siswa->id,
                 'nama_siswa' => $detail->siswa->nama,
@@ -270,4 +301,5 @@ class AbsensiController extends Controller
 
         return new AbsensiResource(true, 'List of Absensi by Detail', $result);
     }
+
 }

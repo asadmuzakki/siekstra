@@ -15,7 +15,7 @@ class KegiatanController extends Controller
     public function index()
     {
         $kegiatans = Kegiatan::with('details', 'kelas_ekskul.ekskul') // Eager load the details and ekskul relationships
-            ->orderBy('created_at', 'desc') // Sort by date ascending
+            ->orderBy('created_at', 'asc') // Sort by date ascending
             ->get();
         return new KegiatanResource(true, 'List of Kegiatan', $kegiatans);
     }
@@ -163,38 +163,66 @@ class KegiatanController extends Controller
         return new KegiatanResource(true, 'Kegiatan Deleted Successfully', null);
     }
 
-    public function showBySiswaId($siswaId, $tahun = null)
+    public function showBySiswaId($siswaId, $tahun = null, $periode = null)
     {
-        // Cari kegiatan berdasarkan siswa_id dari relasi details
+        // Ambil kegiatan berdasarkan siswa_id dari relasi details
         $kegiatans = Kegiatan::whereHas('details', function ($query) use ($siswaId) {
             $query->where('siswa_id', $siswaId);
         })
+            // 🔹 Filter tahun berdasarkan tanggal kegiatan
             ->when($tahun, function ($query) use ($tahun) {
-                $query->whereYear('tanggal_kegiatan', $tahun); // Filter berdasarkan tahun jika diberikan
+                $query->whereYear('tanggal_kegiatan', $tahun);
+            })
+            // 🔹 Filter periode berdasarkan bulan kegiatan
+            ->when($periode, function ($query) use ($periode) {
+                if (strtolower($periode) === 'ganjil') {
+                    // Ganjil: Juli - Desember
+                    $query->whereMonth('tanggal_kegiatan', '>=', 7)
+                        ->whereMonth('tanggal_kegiatan', '<=', 12);
+                } elseif (strtolower($periode) === 'genap') {
+                    // Genap: Januari - Juni
+                    $query->whereMonth('tanggal_kegiatan', '>=', 1)
+                        ->whereMonth('tanggal_kegiatan', '<=', 6);
+                }
             })
             ->with([
                 'details' => function ($query) use ($siswaId) {
                     $query->where('siswa_id', $siswaId);
                 },
-                // 'details.siswa', // Tambahkan relasi siswa untuk mendapatkan kelas
-                'kelas_ekskul.ekskul'
+                'details.siswa',             // Ambil nama siswa
+                'kelas_ekskul.ekskul',       // Ambil nama ekskul
             ])
             ->orderBy('tanggal_kegiatan', 'desc')
             ->get();
 
+        // 🔸 Jika tidak ada data ditemukan
         if ($kegiatans->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No Kegiatan Found for the Given Siswa and Year',
+                'message' => 'No Kegiatan Found for the Given Siswa, Year, or Period',
             ], 404);
         }
 
-        // Tambahkan field nama_ekskul pada setiap item
-        $result = $kegiatans->map(function ($item) {
-            $data = $item->toArray();
-            $data['nama_ekskul'] = $item->kelas_ekskul->ekskul->nama_ekskul ?? null;
-            $data['nama_siswa'] = $item->details->first()->siswa->nama ?? null;
-            return $data;
+        // 🔧 Format hasil untuk response
+        $result = $kegiatans->map(function ($kegiatan) {
+            return [
+                'id' => $kegiatan->id,
+                'tanggal_kegiatan' => $kegiatan->tanggal_kegiatan,
+                'nama_kegiatan' => $kegiatan->nama_kegiatan ?? null,
+                'deskripsi' => $kegiatan->deskripsi ?? null,
+                'tempat' => $kegiatan->tempat ?? null,
+                'nama_ekskul' => $kegiatan->kelas_ekskul->ekskul->nama_ekskul ?? null,
+                'periode' => $kegiatan->kelas_ekskul->periode ?? null,
+                'tahun_ajaran' => $kegiatan->kelas_ekskul->tahun_ajaran ?? null,
+                'details' => $kegiatan->details->map(function ($detail) {
+                    return [
+                        'siswa_id' => $detail->siswa_id,
+                        'nama_siswa' => $detail->siswa->nama ?? null,
+                        'status_kehadiran' => $detail->status_kehadiran ?? null,
+                        'catatan' => $detail->catatan ?? null,
+                    ];
+                }),
+            ];
         });
 
         return response()->json([
@@ -203,4 +231,5 @@ class KegiatanController extends Controller
             'data' => $result,
         ]);
     }
+
 }

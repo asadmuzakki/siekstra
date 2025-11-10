@@ -56,13 +56,13 @@ class DashboardController extends Controller
         $tahun = $request->query('tahun', now()->year); // default tahun sekarang
 
         $data = Ekskul::with([
-            'pendaftarans' => function ($q) use ($tahun) {
+            'kelas_ekskuls.pendaftarans' => function ($q) use ($tahun) {
                 $q->whereYear('tanggal_pendaftaran', $tahun);
             }
         ])->get()->map(function ($e) {
             return [
                 'ekskul' => $e->nama_ekskul,
-                'total' => $e->pendaftarans->count(),
+                'total' => $e->kelas_ekskuls()->pendaftarans()->count(),
             ];
         });
 
@@ -80,7 +80,7 @@ class DashboardController extends Controller
         $tahun = $request->query('tahun');     // contoh: 2025
 
         $query = Ekskul::with([
-            'kegiatans' => function ($q) use ($tingkat, $kategori, $tahun) {
+            'kelas_ekskuls.kegiatans' => function ($q) use ($tingkat, $kategori, $tahun) {
                 if ($tahun) {
                     $q->whereYear('tanggal_kegiatan', $tahun);
                 }
@@ -96,7 +96,7 @@ class DashboardController extends Controller
         $data = $query->get()->map(function ($e) {
             return [
                 'ekskul' => $e->nama_ekskul,
-                'total' => $e->kegiatans->count(),
+                'total' => $e->kelas_ekskuls->kegiatans->count(),
             ];
         });
 
