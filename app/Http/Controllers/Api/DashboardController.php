@@ -89,14 +89,13 @@ class DashboardController extends Controller
         ]);
     }
 
-
     public function grafikKegiatan(Request $request)
     {
         $tingkat = $request->query('tingkat');   // contoh: "5"
-        $kategori = $request->query('kategori');  // contoh: "Olahraga"
-        $tahun = $request->query('tahun');     // contoh: 2025
+        $kategori = $request->query('kategori'); // contoh: "Olahraga"
+        $tahun = $request->query('tahun');       // contoh: 2025
 
-        $query = Ekskul::with([
+        $query = \App\Models\Ekskul::with([
             'kelas_ekskuls.kegiatans' => function ($q) use ($tingkat, $kategori, $tahun) {
                 if ($tahun) {
                     $q->whereYear('tanggal_kegiatan', $tahun);
@@ -110,12 +109,29 @@ class DashboardController extends Controller
             }
         ]);
 
-        $data = $query->get()->map(function ($e) {
+        $data = $query->get()->map(function ($e) use ($tahun, $tingkat, $kategori) {
+            // Hitung total kegiatan dari semua kelas_ekskul milik ekskul ini
+            $totalKegiatan = $e->kelas_ekskuls->sum(function ($kelas) {
+                return $kelas->kegiatans->count();
+            });
+
             return [
                 'ekskul' => $e->nama_ekskul,
-                'total' => $e->kelas_ekskuls->kegiatans->count(),
+                'tahun' => $tahun,
+                'tingkat' => $tingkat,
+                'kategori' => $kategori,
+                'total_kegiatan' => $totalKegiatan,
             ];
         });
+
+        // Jika semua ekskul tidak punya kegiatan
+        if ($data->sum('total_kegiatan') === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada data kegiatan ekskul yang sesuai dengan filter.',
+                'data' => [],
+            ], 404);
+        }
 
         return response()->json([
             'success' => true,
