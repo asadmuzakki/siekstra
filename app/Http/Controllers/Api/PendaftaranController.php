@@ -26,17 +26,19 @@ class PendaftaranController extends Controller
     }
 
     /**
-     * show by ekskul_id
+     * Show pendaftaran berdasarkan kelas_ekskul_id
      */
-    public function showByEkskul($ekskul_id)
+    public function showByKelasEkskul($kelas_ekskul_id)
     {
-        $pendaftarans = Pendaftaran::whereHas('kelas_ekskul', function ($query) use ($ekskul_id) {
-            $query->where('ekskul_id', $ekskul_id);
-        })
-            ->with('siswa', 'kelas_ekskul.ekskul')
+        $pendaftarans = Pendaftaran::where('kelas_ekskul_id', $kelas_ekskul_id)
+            ->with(['siswa', 'kelas_ekskul.ekskul'])
             ->get();
 
-        return new PendaftaranResource(true, 'List of Pendaftaran by Ekskul', $pendaftarans);
+        if ($pendaftarans->isEmpty()) {
+            return new PendaftaranResource(false, 'Pendaftaran Not Found', null);
+        }
+
+        return new PendaftaranResource(true, 'List of Pendaftaran by Kelas Ekskul', $pendaftarans);
     }
 
     /**
