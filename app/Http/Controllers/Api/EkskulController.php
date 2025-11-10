@@ -57,7 +57,7 @@ class EkskulController extends Controller
      */
     public function show($id)
     {
-        $ekskul = Ekskul::with(['tutor', 'kelas_ekskul'])->find($id);
+        $ekskul = Ekskul::with(['tutor', 'kelas_ekskuls'])->find($id);
 
         if (!$ekskul) {
             return new EkskulResource(false, 'Ekskul Not Found', null);
