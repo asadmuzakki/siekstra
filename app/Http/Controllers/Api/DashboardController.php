@@ -95,7 +95,7 @@ class DashboardController extends Controller
         $kategori = $request->query('kategori'); // contoh: "Olahraga"
         $tahun = $request->query('tahun');       // contoh: 2025
 
-        $query = \App\Models\Ekskul::with([
+        $query = Ekskul::with([
             'kelas_ekskuls.kegiatans' => function ($q) use ($tingkat, $kategori, $tahun) {
                 if ($tahun) {
                     $q->whereYear('tanggal_kegiatan', $tahun);
