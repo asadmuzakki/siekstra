@@ -38,7 +38,7 @@ class DashboardController extends Controller
             ? round(($totalHadir / $totalAbsensi) * 100, 2)
             : 0;
 
-            
+
         return response()->json([
             'success' => true,
             'message' => 'Dashboard Data',
@@ -53,25 +53,42 @@ class DashboardController extends Controller
 
     public function grafikPendaftaran(Request $request)
     {
-        $tahun = $request->query('tahun', now()->year); // default tahun sekarang
+        $tahun = $request->query('tahun', now()->year); // default: tahun sekarang
 
-        $data = Ekskul::with([
+        // Ambil semua ekskul dengan kelas_ekskul dan pendaftarannya di tahun tersebut
+        $data = \App\Models\Ekskul::with([
             'kelas_ekskuls.pendaftarans' => function ($q) use ($tahun) {
                 $q->whereYear('tanggal_pendaftaran', $tahun);
             }
-        ])->get()->map(function ($e) {
+        ])->get()->map(function ($e) use ($tahun) {
+            // Hitung total pendaftaran dari semua kelas ekskul di tahun tersebut
+            $totalPendaftaran = $e->kelas_ekskuls->sum(function ($kelas) {
+                return $kelas->pendaftarans->count();
+            });
+
             return [
                 'ekskul' => $e->nama_ekskul,
-                'total' => $e->kelas_ekskuls()->pendaftarans()->count(),
+                'tahun' => $tahun,
+                'total_pendaftaran' => $totalPendaftaran,
             ];
         });
 
+        // Jika semua ekskul kosong
+        if ($data->sum('total_pendaftaran') === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada data pendaftaran ekskul untuk tahun ' . $tahun,
+                'data' => [],
+            ], 404);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Grafik Pendaftaran Ekskul',
+            'message' => 'Grafik Pendaftaran Ekskul Tahun ' . $tahun,
             'data' => $data,
         ]);
     }
+
 
     public function grafikKegiatan(Request $request)
     {
