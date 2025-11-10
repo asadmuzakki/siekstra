@@ -53,6 +53,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
         Route::get('/{id}', [KelasEkskulController::class, 'show']);
         Route::post('/', [KelasEkskulController::class, 'store']);
         Route::put('/{id}', [KelasEkskulController::class, 'update']);
+        Route::patch('/{id}', [KelasEkskulController::class, 'update']);
         Route::delete('/{id}', [KelasEkskulController::class, 'destroy']);
     });
 });
