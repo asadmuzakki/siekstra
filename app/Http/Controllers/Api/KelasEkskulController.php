@@ -129,4 +129,14 @@ class KelasEkskulController extends Controller
             return new KelasEkskulResource(false, $e->getMessage(), null);
         }
     }
+    public function getKelasByIdEkskul($ekskulId)
+    {
+        try {
+            $kelas = KelasEkskul::where('ekskul_id', $ekskulId)->get();
+
+            return new KelasEkskulResource(true, 'Kelas ekskul retrieved successfully.', $kelas);
+        } catch (\Throwable $e) {
+            return new KelasEkskulResource(false, $e->getMessage(), null);
+        }
+    }
 }
