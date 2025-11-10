@@ -15,8 +15,7 @@ class EkskulController extends Controller
      */
     public function index()
     {
-        $ekskuls = Ekskul::with(['tutor', 'kelas_ekskuls.pedaftarans'])
-            ->withCount('kelas_ekskuls.pendaftarans')
+        $ekskuls = Ekskul::with(['tutor', 'kelas_ekskuls'])
             ->get();
         return new EkskulResource(true, 'List of Ekskul', $ekskuls);
     }
