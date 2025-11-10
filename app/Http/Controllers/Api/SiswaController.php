@@ -14,8 +14,8 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        $siswas = Siswa::with('pendaftarans.ekskul') // Eager load the ekskuls relationship
-            ->orderBy('created_at', 'desc')
+        $siswas = Siswa::with('pendaftarans.kelas_ekskul.ekskul') // Eager load the ekskuls relationship
+            ->orderBy('created_at', 'asc')
             ->get();
         return new SiswaResource(true, 'List of Siswas', $siswas);
     }
