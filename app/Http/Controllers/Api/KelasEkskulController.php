@@ -129,14 +129,40 @@ class KelasEkskulController extends Controller
             return new KelasEkskulResource(false, $e->getMessage(), null);
         }
     }
-    public function getKelasByIdEkskul($ekskulId)
+    public function getKelasByIdEkskul(Request $request, $ekskulId)
     {
         try {
-            $kelas = KelasEkskul::where('ekskul_id', $ekskulId)->get();
+            // Ambil query params dari request (opsional)
+            $periodeFilter = $request->query('periode');
+            $tahunFilter = $request->query('tahun');
 
-            return new KelasEkskulResource(true, 'Kelas ekskul retrieved successfully.', $kelas);
+            // Tentukan periode aktif berdasarkan bulan saat ini
+            $bulanSekarang = now()->month;
+            $periodeAktif = $bulanSekarang >= 7 ? 'Ganjil' : 'Genap';
+            $tahunSekarang = now()->year;
+
+            // Jika tidak ada query, gunakan default (tahun & periode aktif)
+            $periode = $periodeFilter ?? $periodeAktif;
+            $tahun = $tahunFilter ?? $tahunSekarang;
+
+            // Ambil data kelas ekskul sesuai ekskul_id + filter tahun & periode
+            $kelas = KelasEkskul::where('ekskul_id', $ekskulId)
+                ->where('periode', $periode)
+                ->where(function ($query) use ($tahun) {
+                    // Handle tahun ajaran berbentuk "2025/2026"
+                    $query->where('tahun_ajaran', 'like', "%$tahun%");
+                })
+                ->get();
+
+            // Jika tidak ada hasil
+            if ($kelas->isEmpty()) {
+                return new KelasEkskulResource(false, "Tidak ada kelas ekskul untuk tahun $tahun dan periode $periode.", null);
+            }
+
+            return new KelasEkskulResource(true, "Kelas ekskul tahun $tahun periode $periode retrieved successfully.", $kelas);
         } catch (\Throwable $e) {
             return new KelasEkskulResource(false, $e->getMessage(), null);
         }
     }
+
 }
