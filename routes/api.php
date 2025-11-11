@@ -91,14 +91,7 @@ Route::middleware(['auth:sanctum', 'role:wali_murid'])->prefix('wali_murid')->gr
     Route::get('/anak-wali', [SiswaController::class, 'anakWali']);
     Route::get('/getEkskul', [EkskulController::class, 'index']);
     Route::apiResource('ekskul', SiswaController::class);
-    Route::prefix('kelas-ekskul')->group(function () {
-        Route::get('/', [KelasEkskulController::class, 'index']);
-        Route::get('/{id}', [KelasEkskulController::class, 'show']);
-        Route::post('/', [KelasEkskulController::class, 'store']);
-        Route::put('/{id}', [KelasEkskulController::class, 'update']);
-        Route::patch('/{id}', [KelasEkskulController::class, 'update']);
-        Route::delete('/{id}', [KelasEkskulController::class, 'destroy']);
-    });
+    Route::get('/getkelasByEkskul/{ekskulId}', [KelasEkskulController::class, 'getKelasByIdEkskul']);
 });
 
 Route::post('/tes-absensi', [TesController::class, 'store']);
