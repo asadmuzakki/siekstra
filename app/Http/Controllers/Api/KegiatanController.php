@@ -210,6 +210,8 @@ class KegiatanController extends Controller
                 'id' => $kegiatan->id,
                 'tanggal_kegiatan' => $kegiatan->tanggal_kegiatan,
                 'nama_kegiatan' => $kegiatan->nama_kegiatan ?? null,
+                'kategori' => $kegiatan->kategori ?? null,   // 🔹 Tambahan: kategori kegiatan
+                'tingkat' => $kegiatan->tingkat ?? null,     // 🔹 Tambahan: tingkat kegiatan
                 'deskripsi' => $kegiatan->deskripsi ?? null,
                 'tempat' => $kegiatan->tempat ?? null,
                 'nama_ekskul' => $kegiatan->kelas_ekskul->ekskul->nama_ekskul ?? null,
@@ -219,7 +221,7 @@ class KegiatanController extends Controller
                     return [
                         'siswa_id' => $detail->siswa_id,
                         'nama_siswa' => $detail->siswa->nama ?? null,
-                        'status_kehadiran' => $detail->status_kehadiran ?? null,
+                        'status' => $detail->status ?? null, // 🔹 Tambahan: status dari tabel detail
                         'catatan' => $detail->catatan ?? null,
                     ];
                 }),
