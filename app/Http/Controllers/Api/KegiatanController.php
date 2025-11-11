@@ -22,14 +22,14 @@ class KegiatanController extends Controller
     /**
      * Rekap Kegiatan
      */
-    public function rekap($ekskul_id)
+    public function rekap($kelas_ekskul_id)
     {
-        $kegiatans = Kegiatan::with('details', 'kelas_ekskul')
-            ->whereHas('kelas_ekskul', function ($query) use ($ekskul_id) {
-                $query->where('ekskul_id', $ekskul_id); // Filter berdasarkan ekskul_id
-            })
+        // Ambil semua kegiatan berdasarkan kelas_ekskul_id
+        $kegiatans = Kegiatan::with(['details', 'kelas_ekskul'])
+            ->where('kelas_ekskul_id', $kelas_ekskul_id)
             ->get();
 
+        // Buat rekap per kegiatan
         $rekap = $kegiatans->map(function ($kegiatan) {
             $total = $kegiatan->details->count();
             $hadir = $kegiatan->details->where('status', 'Hadir')->count();
@@ -51,10 +51,11 @@ class KegiatanController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Rekap absensi berhasil diambil',
+            'message' => 'Rekap absensi berdasarkan kelas ekskul berhasil diambil',
             'data' => $rekap
         ]);
     }
+
 
     /**
      * Store a newly created resource in storage.
