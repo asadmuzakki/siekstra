@@ -162,14 +162,18 @@ class EkskulController extends Controller
             $tingkat = $matches[0] ?? null;
 
             if ($tingkat) {
-                // Cari ekskul berdasarkan tingkat kelas siswa
-                $ekskuls = Ekskul::where('kelas_min', '<=', $tingkat)
+                // Eager load kelas_ekskuls dan pendaftarans untuk menghindari N+1
+                $ekskuls = Ekskul::with(['kelas_ekskuls.pendaftarans'])
+                    ->where('kelas_min', '<=', $tingkat)
                     ->where('kelas_max', '>=', $tingkat)
-                    ->where('status', 'aktif') // Hanya ambil ekskul yang aktif
+                    ->where('status', 'aktif') // sesuaikan dengan nilai di DB ('Aktif' / 'aktif')
                     ->get()
                     ->map(function ($ekskul) use ($siswa) {
-                        // Periksa apakah siswa sudah terdaftar di ekskul ini
-                        $isRegistered = $ekskul->kelas_ekskuls()->pendaftarans()->where('siswa_id', $siswa->id)->exists();
+                        // Cek apakah ada kelas_ekskul milik ekskul ini yang memiliki pendaftaran untuk siswa
+                        $isRegistered = $ekskul->kelas_ekskuls->contains(function ($kelas) use ($siswa) {
+                            // setiap $kelas adalah model KelasEkskul, pendaftarans adalah koleksi
+                            return $kelas->pendaftarans->contains('siswa_id', $siswa->id);
+                        });
 
                         return [
                             'id' => $ekskul->id,
@@ -179,7 +183,7 @@ class EkskulController extends Controller
                             'tempat' => $ekskul->tempat,
                             'status' => $ekskul->status,
                             'foto_url' => $ekskul->foto_url,
-                            'is_registered' => $isRegistered, // Tambahkan status terdaftar
+                            'is_registered' => (bool) $isRegistered,
                         ];
                     });
             } else {
@@ -195,6 +199,7 @@ class EkskulController extends Controller
 
         return new EkskulResource(true, 'Ekskul Found', $result);
     }
+
 
     public function showBySiswaId($siswaId)
     {
