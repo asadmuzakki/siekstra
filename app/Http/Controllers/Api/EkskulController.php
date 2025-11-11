@@ -169,7 +169,7 @@ class EkskulController extends Controller
                     ->get()
                     ->map(function ($ekskul) use ($siswa) {
                         // Periksa apakah siswa sudah terdaftar di ekskul ini
-                        $isRegistered = $ekskul->pendaftarans()->where('siswa_id', $siswa->id)->exists();
+                        $isRegistered = $ekskul->kelas_ekskuls()->pendaftarans()->where('siswa_id', $siswa->id)->exists();
 
                         return [
                             'id' => $ekskul->id,
